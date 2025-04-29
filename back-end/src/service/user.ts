@@ -28,7 +28,7 @@ export default class UserService {
         };
       }
       const existUser = await User.findOne({ email });
-      console.log(existUser?.username);
+
       if (existUser) {
         return {
           status: "fail",

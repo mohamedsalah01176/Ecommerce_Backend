@@ -16,8 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // Meddileware
 
-// app.use("/auth", userRouter);
-// app.use("/api/auth", authUser);
+app.use("/api/auth", authUser);
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;
 
