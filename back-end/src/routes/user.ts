@@ -11,5 +11,6 @@ const userControl = new UserControl(userService);
 
 router.post("/signup", (req, res) => userControl.signUpController(req, res));
 router.post("/signin", userControl.loginController.bind(userControl));
+router.post("/signout", userControl.logOutController.bind(userControl));
 
 export default router;
