@@ -17,6 +17,7 @@ app.use(cookieParser());
 // Meddileware
 
 app.use("/api/auth", authUser);
+
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;
 
