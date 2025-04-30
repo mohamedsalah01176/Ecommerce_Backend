@@ -116,4 +116,7 @@ export default class UserService {
       };
     }
   }
+  async signout(user: IUser): Promise<string> {
+    return "Successfully signed out";
+  }
 }

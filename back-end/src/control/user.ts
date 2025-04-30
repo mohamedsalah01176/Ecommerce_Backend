@@ -42,7 +42,27 @@ export default class UserControl {
       }
     } catch (err) {
       console.error("Error during login:", err);
-      next(err); // Pass the error to the next middleware
+      next(err);
+    }
+  }
+  async logOutController(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const result = await this.userService.signout(req.body);
+      res.clearCookie("auth_token", {
+        sameSite: "strict",
+        maxAge: 3600000,
+      });
+      res.status(200).json({
+        status: "success",
+        message: result,
+      });
+    } catch (err) {
+      console.error("Error during logout:", err);
+      next(err);
     }
   }
 }
