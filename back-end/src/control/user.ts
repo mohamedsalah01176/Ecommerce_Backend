@@ -42,7 +42,7 @@ export default class UserControl {
       }
     } catch (err) {
       console.error("Error during login:", err);
-      next(err);
+      next(err); // Pass the error to the next middleware
     }
   }
   async logOutController(
@@ -51,18 +51,27 @@ export default class UserControl {
     next: NextFunction
   ): Promise<void> {
     try {
-      const result = await this.userService.signout(req.body);
-      res.clearCookie("auth_token", {
-        sameSite: "strict",
-        maxAge: 3600000,
-      });
-      res.status(200).json({
-        status: "success",
-        message: result,
-      });
-    } catch (error) {
-      console.error("Error during logout:", error);
-      next(error);
+      const result = await this.userService.signIn(req.body);
+
+      if (result.status === "success" && result.token) {
+        res.cookie("auth_token", result.token, {
+          sameSite: "strict",
+          maxAge: 3600000, // 1 hour
+        });
+
+        res.status(200).json({
+          status: "success",
+          message: result.message,
+        });
+      } else {
+        res.status(401).json({
+          status: result.status,
+          message: result.message,
+        });
+      }
+    } catch (err) {
+      console.error("Error during login:", err);
+      next(err); // Pass the error to the next middleware
     }
   }
 }
