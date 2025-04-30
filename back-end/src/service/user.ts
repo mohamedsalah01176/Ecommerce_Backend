@@ -2,10 +2,12 @@ import { IUser } from "../interface/user";
 import signUpSchema from "../middleware/validator";
 import User from "../model/user";
 import bcrypt from "bcrypt";
-import hashPassword from "../utils/hash";
+
 import schemas from "../middleware/validator";
 import jwt from "jsonwebtoken";
 
+import myHash from "../utils/hash";
+import hashpass from "../utils/hash";
 export default class UserService {
   constructor() {}
 
@@ -36,7 +38,7 @@ export default class UserService {
         };
       }
 
-      const hashedPAssword = await hashPassword(password, 10);
+      const hashedPAssword = await hashpass.hashPassword(password, 10);
 
       const newUser = new User({
         username,
@@ -59,31 +61,34 @@ export default class UserService {
       message: "User data received",
     };
   }
-  async signIn(
-    user: IUser
-  ): Promise<{ status: string; message: string; token?: string }> {
+  async signIn(user: IUser) {
     const { email, password } = user;
     try {
       const { error, value } = schemas.signInSchema.validate({
         email,
         password,
       });
+      console.log(value);
       const existUser = await User.findOne({ email }).select("password");
       if (!existUser) {
         return {
-          status: "sucess",
+          status: "fail",
           message: "user is not Exist",
         };
       }
-      const result = await hashPassword(password, existUser.password);
-
+      console.log(existUser);
+      const result = await hashpass.hashValidation(
+        password,
+        existUser.password
+      );
+      console.log();
       if (!result) {
         return {
           status: "fail",
           message: "ivalid credential",
         };
       }
-
+      console.log(result);
       const token = jwt.sign(
         {
           userID: existUser._id,
@@ -102,7 +107,7 @@ export default class UserService {
       return {
         status: "success",
         message: "Login successful",
-        token, // return token to the controller
+        token,
       };
     } catch (err) {
       return {

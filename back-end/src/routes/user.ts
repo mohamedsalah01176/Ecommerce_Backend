@@ -1,12 +1,15 @@
-import Router from "express";
+// router/user.ts or similar
+
+import { Router } from "express";
 import UserService from "../service/user";
 import UserControl from "../control/user";
 
-let router = Router();
+const router = Router();
 
-let userService = new UserService();
-let userControl = new UserControl(userService);
+const userService = new UserService();
+const userControl = new UserControl(userService);
 
-router.post("/signup", (req, res) => userControl.signUp(req, res));
+router.post("/signup", (req, res) => userControl.signUpController(req, res));
+router.post("/signin", userControl.loginController.bind(userControl));
 
 export default router;

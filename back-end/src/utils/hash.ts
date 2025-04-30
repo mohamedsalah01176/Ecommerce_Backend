@@ -26,4 +26,4 @@ const hashpass = {
   hashPassword,
 };
 
-export default hash;
+export default hashpass;
