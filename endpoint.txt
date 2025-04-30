@@ -1,0 +1,2 @@
+http://localhost:4000/api/auth/signup => to register 
+http://localhost:4000/api/auth/signin => to login
