@@ -33,6 +33,7 @@ export default class UserControl {
         res.status(200).json({
           status: "success",
           message: result.message,
+          token:result.token
         });
       } else {
         res.status(401).json({

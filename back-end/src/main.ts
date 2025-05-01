@@ -6,7 +6,13 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import cors from "cors";
 import authUser from "./routes/user";
+import feedbackRouter from "./routes/feedback";
+import productRouter from "./routes/produtc";
+
+
 const app = express();
+
+
 // cofigration
 dotenv.config();
 app.use(cors());
@@ -14,9 +20,16 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+
+
 // Meddileware
 
+
+
 app.use("/api/auth", authUser);
+app.use("/api", feedbackRouter);
+app.use("/api", productRouter);
 
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;
