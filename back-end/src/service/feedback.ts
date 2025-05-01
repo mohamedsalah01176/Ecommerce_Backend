@@ -7,9 +7,7 @@ export default class FeedBackService{
 
 
     handleCreateFeedback(body:IFeedback){
-        console.log(body)
         try{
-
             let filePah=path.join(__dirname,"..","data",'feedback.xlsx');
             if(filePah){
     
