@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 
 import myHash from "../utils/hash";
 import hashpass from "../utils/hash";
+import transport from "../middleware/sendemail";
+
 export default class UserService {
   constructor() {}
 
@@ -118,5 +120,62 @@ export default class UserService {
   }
   async signout(user: IUser): Promise<string> {
     return "Successfully signed out";
+  }
+  async sendVerificationCode(user: IUser) {
+    const { email } = user;
+    try {
+      const existUser = await User.findOne({ email });
+      if (!existUser) {
+        return {
+          status: "fail",
+          message: "User does not exist",
+        };
+      }
+
+      if (existUser.verified) {
+        return {
+          status: "fail",
+          message: "You are already verified!",
+        };
+      }
+
+      const verificationCodevalue = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
+
+      const info = await transport.sendMail({
+        from: process.env.SEND_EMAIL_ADDRESS,
+        to: existUser.email,
+        subject: "Verification Code",
+        html: `<h1>${verificationCodevalue}</h1>`,
+      });
+      const secret = process.env.VERIFICATION_CODE_SECRET;
+      if (info.accepted[0] === existUser.email) {
+        const hashedCodevalue = await myHash.hmacProcess(
+          verificationCodevalue,
+          secret as string
+        );
+
+        existUser.verificationCode = hashedCodevalue;
+        existUser.verificationCodeValidation = Date.now() + 10 * 60 * 1000;
+        await existUser.save();
+
+        return {
+          status: "success",
+          message: "Verification code sent",
+        };
+      }
+
+      return {
+        status: "fail",
+        message: "Verification code not sent",
+      };
+    } catch (error) {
+      console.error("Verification error:", error);
+      return {
+        status: "error",
+        message: "Internal server error",
+      };
+    }
   }
 }

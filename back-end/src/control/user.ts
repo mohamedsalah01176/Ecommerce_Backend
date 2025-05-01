@@ -75,4 +75,24 @@ export default class UserControl {
       next(err); // Pass the error to the next middleware
     }
   }
+
+  async sendVerificationCodeController(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const user = req.body;
+
+    try {
+      const result = await this.userService.sendVerificationCode(user);
+      const statusCode = result.status === "fail" ? 400 : 200;
+      res.status(statusCode).json(result);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
+      next(error);
+    }
+  }
 }
