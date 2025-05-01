@@ -8,6 +8,7 @@ import cors from "cors";
 import authUser from "./routes/user";
 import feedbackRouter from "./routes/feedback";
 import productRouter from "./routes/produtc";
+import categoriesRouter from "./routes/categories";
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(cookieParser());
 app.use("/api/auth", authUser);
 app.use("/api", feedbackRouter);
 app.use("/api", productRouter);
+app.use("/api", categoriesRouter);
 
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;
