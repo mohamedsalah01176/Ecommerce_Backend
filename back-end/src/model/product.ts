@@ -1,23 +1,32 @@
 import mongoose from "mongoose";
+import { IProduct } from "../interface/product";
 
 let schema=new mongoose.Schema({
   title: {
     type: String,
-    minlength: [2, "Title must be at least 2 characters."]
+    minlength: [2, "Title must be at least 2 characters."],
+    required:true
+  },
+  sold:{
+    type:String,
+    required:true
   },
   slug: {
     type: String
   },
   description: {
-    type: String
+    type: String,
+    required:true,
   },
   quantity: {
     type: Number,
-    min: [0, "Quantity cannot be negative."]
+    min: [0, "Quantity cannot be negative."],
+    required:true
   },
   price: {
     type: Number,
-    min: [0, "Price must be a positive number."]
+    min: [0, "Price must be a positive number."],
+    required:true
   },
   imageCover: {
     type: String
@@ -62,6 +71,6 @@ let schema=new mongoose.Schema({
 
 
 
-let ProductModel=mongoose.model('product',schema);
+let ProductModel=mongoose.model<IProduct>('product',schema);
 
 export default ProductModel;

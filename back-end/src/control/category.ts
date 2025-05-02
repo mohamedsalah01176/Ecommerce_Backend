@@ -15,8 +15,8 @@ export default class CategoriesControl{
     }
     
     async getSpecificCategory(req:Request,res:Response){
-        let id=req.params.id;
-        let resSer=await this.categoriesService.handleSpecificCategory(id);
+        let name=req.params.name;
+        let resSer=await this.categoriesService.handleSpecificCategory(name);
         if(resSer.status == 'fail'){
             res.status(404).send(resSer);
         }else{

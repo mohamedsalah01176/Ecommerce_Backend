@@ -7,7 +7,7 @@ let router=Router();
 let categoriesService=new CategoriesService();
 let categoriesControl=new CategoriesControl(categoriesService);
 router.get('/categories',(req,res)=>categoriesControl.getAllService(req,res))
-router.get('/categories/:id',(req,res)=>categoriesControl.getSpecificCategory(req,res))
+router.get('/categories/:name',(req,res)=>categoriesControl.getSpecificCategory(req,res))
 
 
 
