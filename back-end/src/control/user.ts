@@ -43,7 +43,7 @@ export default class UserControl {
       }
     } catch (err) {
       console.error("Error during login:", err);
-      next(err); // Pass the error to the next middleware
+      next(err);
     }
   }
   async logOutController(
@@ -52,27 +52,28 @@ export default class UserControl {
     next: NextFunction
   ): Promise<void> {
     try {
-      const result = await this.userService.signIn(req.body);
+      const token = req.cookies?.auth_token;
 
-      if (result.status === "success" && result.token) {
-        res.cookie("auth_token", result.token, {
-          sameSite: "strict",
-          maxAge: 3600000, // 1 hour
+      if (!token) {
+        res.status(400).json({
+          status: "fail",
+          message: "No active session found",
         });
-
-        res.status(200).json({
-          status: "success",
-          message: result.message,
-        });
-      } else {
-        res.status(401).json({
-          status: result.status,
-          message: result.message,
-        });
+        return;
       }
-    } catch (err) {
-      console.error("Error during login:", err);
-      next(err); // Pass the error to the next middleware
+
+      res.clearCookie("auth_token", {
+        sameSite: "strict",
+        httpOnly: true,
+      });
+
+      res.status(200).json({
+        status: "success",
+        message: "Successfully signed out",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      next(error);
     }
   }
 

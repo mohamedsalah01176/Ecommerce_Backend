@@ -70,7 +70,6 @@ export default class UserService {
         email,
         password,
       });
-      console.log(value);
       const existUser = await User.findOne({ email }).select("password");
       if (!existUser) {
         return {
@@ -118,9 +117,10 @@ export default class UserService {
       };
     }
   }
-  async signout(user: IUser): Promise<string> {
-    return "Successfully signed out";
+  async signout(): Promise<{ message: string }> {
+    return { message: "Successfully signed out" };
   }
+
   async sendVerificationCode(user: IUser) {
     const { email } = user;
     try {
