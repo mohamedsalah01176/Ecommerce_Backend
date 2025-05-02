@@ -46,10 +46,11 @@ export default class ProductService{
     }
     async handleAddProduct(body:IProduct,token:string){
         try{
+          console.log(token)
             let user:any=  jwt.verify(token,process.env.TOKEN_SECRET as string)
-            console.log(user.role,"ddddddd")
-            // if(user.r)
-            let newProduct=new ProductModel({...body,adminId:user.userID  })
+            console.log(user,"ddddddd")
+            let newProduct=new ProductModel({...body,adminId:user.userID ,createdAt:new Date()})
+
             await newProduct.save();
             return{
                 status:"success",
@@ -77,5 +78,31 @@ export default class ProductService{
                 message:errors
             }
         }
+    }
+    async handleUpdateProduct(body:IProduct,id:string){
+      try{
+        
+        let product =await ProductModel.findByIdAndUpdate(id,{...body,updatedAt:new Date()},{
+          new:true,
+          runValidators:true
+        });
+        if(product){
+          return{
+            status:"success",
+            product
+          }
+        }else{
+          return{
+            status:"fail",
+            message:"Product Not Found"
+          }
+        }
+      }
+      catch(errors){
+        return{
+          status:"error",
+          errors
+        }
+      }
     }
 }

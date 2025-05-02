@@ -1,10 +1,14 @@
-import { required } from "joi";
 import mongoose from "mongoose";
+import { IProduct } from "../interface/product";
 
 let schema=new mongoose.Schema({
   title: {
     type: String,
     minlength: [2, "Title must be at least 2 characters."],
+    required:true
+  },
+  sold:{
+    type:String,
     required:true
   },
   slug: {
@@ -67,6 +71,6 @@ let schema=new mongoose.Schema({
 
 
 
-let ProductModel=mongoose.model('product',schema);
+let ProductModel=mongoose.model<IProduct>('product',schema);
 
 export default ProductModel;

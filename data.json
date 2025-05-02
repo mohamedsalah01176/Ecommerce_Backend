@@ -20,12 +20,8 @@
     },
     "ratingsAverage": 4.8,
     "ratingsQuantity": 18,
-    "createdAt": {
-      "$date": "2023-04-02T02:39:17.204Z"
-    },
-    "updatedAt": {
-      "$date": "2025-04-17T17:14:37.026Z"
-    },
+    "createdAt":  "2023-04-02T02:39:17.204Z",
+    "updatedAt":  "2025-04-17T17:14:37.026Z",
     "adminId":"681158e4c37e876b1f7399ac"
 },
 {
@@ -50,12 +46,8 @@
     },
     "ratingsAverage": 4.2,
     "ratingsQuantity": 10,
-    "createdAt": {
-        "$date": "2023-04-02T02:29:24.696Z"
-    },
-    "updatedAt": {
-        "$date": "2025-04-17T16:08:29.679Z"
-    },
+    "createdAt": "2023-04-02T02:29:24.696Z",
+    "updatedAt": "2025-04-17T16:08:29.679Z",
     "adminId":"681151f0a1951c23cf029ad8"
   },
   {
@@ -78,12 +70,8 @@
     },
     "ratingsAverage": 4.8,
     "ratingsQuantity": 5,
-    "createdAt": {
-      "$date": "2023-04-02T02:14:33.277Z"
-    },
-    "updatedAt": {
-      "$date": "2025-04-17T17:05:28.275Z"
-    },
+    "createdAt": "2023-04-02T02:14:33.277Z",
+    "updatedAt": "2025-04-17T17:05:28.275Z",
     "adminId":"68112dff5715ea9af287ec7b"
   }
 ]

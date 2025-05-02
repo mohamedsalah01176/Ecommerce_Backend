@@ -42,4 +42,15 @@ export default class ProductControl{
             res.status(200).send(resSer)
         }
     }
+    async updateProduct(req:Request,res:Response){
+        let body=req.body;
+        let id=req.params.id
+        let resSer=await this.productService.handleUpdateProduct(body,id);
+        if(resSer.status == "error"){
+            res.status(500).send(resSer)
+        }else{
+            res.status(200).send(resSer)
+        }
+
+    }
 }

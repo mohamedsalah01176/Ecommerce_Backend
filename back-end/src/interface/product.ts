@@ -3,6 +3,7 @@
 export interface IProduct {
   title: Title;
   slug?: Slug;
+  sold:string,
   description: Slug;
   quantity: Quantity;
   price: Quantity;
