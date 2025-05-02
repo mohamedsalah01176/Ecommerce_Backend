@@ -1,0 +1,89 @@
+[
+  {
+    "sold":"200",
+    "title": "Woman Shawl",
+    "slug": "woman-shawl",
+    "description": "Material\tPolyester Blend\nColour Name\tMulticolour\nDepartment\tWomen",
+    "quantity": 220,
+    "price": 149,
+    "imageCover": "https://ecommerce.routemisr.com/Route-Academy-products/1680403156501-cover.jpeg",
+    "images": [
+      "https://ecommerce.routemisr.com/Route-Academy-products/1680403156555-3.jpeg",
+      "https://ecommerce.routemisr.com/Route-Academy-products/1680403156555-2.jpeg",
+      "https://ecommerce.routemisr.com/Route-Academy-products/1680403156554-1.jpeg",
+      "https://ecommerce.routemisr.com/Route-Academy-products/1680403156556-4.jpeg"
+    ],
+    "category": {
+      "name": "Women's Fashion",
+      "slug": "women's-fashion",
+      "image": "https://ecommerce.routemisr.com/Route-Academy-categories/1681511818071.jpeg"
+    },
+    "ratingsAverage": 4.8,
+    "ratingsQuantity": 18,
+    "createdAt": {
+      "$date": "2023-04-02T02:39:17.204Z"
+    },
+    "updatedAt": {
+      "$date": "2025-04-17T17:14:37.026Z"
+    },
+    "adminId":"681158e4c37e876b1f7399ac"
+},
+{
+    "sold":"100",
+    "title": "Woman Shawl",
+    "slug": "woman-shawl",
+    "description": "Material\tPolyester Blend\nColour Name\tBeige\nDepartment\tWomen",
+    "quantity": 228,
+    "price": 349,
+    "imageCover": "https://ecommerce.routemisr.com/Route-Academy-products/1680402563605-cover.jpeg",
+    "images": [
+        "https://ecommerce.routemisr.com/Route-Academy-products/1680402563676-2.jpeg",
+        "https://ecommerce.routemisr.com/Route-Academy-products/1680402563676-3.jpeg",
+        "https://ecommerce.routemisr.com/Route-Academy-products/1680402563677-4.jpeg",
+        "https://ecommerce.routemisr.com/Route-Academy-products/1680402563675-1.jpeg",
+        "https://ecommerce.routemisr.com/Route-Academy-products/1680402563677-5.jpeg"
+    ],
+    "category": {
+        "name": "Women's Fashion",
+        "slug": "women's-fashion",
+        "image": "https://ecommerce.routemisr.com/Route-Academy-categories/1681511818071.jpeg"
+    },
+    "ratingsAverage": 4.2,
+    "ratingsQuantity": 10,
+    "createdAt": {
+        "$date": "2023-04-02T02:29:24.696Z"
+    },
+    "updatedAt": {
+        "$date": "2025-04-17T16:08:29.679Z"
+    },
+    "adminId":"681151f0a1951c23cf029ad8"
+  },
+  {
+    "sold":"300",
+    "title": "Relaxed Fit Knitted Joggers Lilac",
+    "slug": "relaxed-fit-knitted-joggers-lilac",
+    "description": "Colour Name\tPink\nDepartment\tWomen\nMaterial Composition\tPolyester Blend",
+    "quantity": 222,
+    "price": 499,
+    "imageCover": "https://ecommerce.routemisr.com/Route-Academy-products/1680401672268-cover.jpeg",
+    "images": [
+      "https://ecommerce.routemisr.com/Route-Academy-products/1680401672624-2.jpeg",
+      "https://ecommerce.routemisr.com/Route-Academy-products/1680401672623-1.jpeg",
+      "https://ecommerce.routemisr.com/Route-Academy-products/1680401672624-3.jpeg"
+    ],
+    "category": {
+      "name": "Women's Fashion",
+      "slug": "women's-fashion",
+      "image": "https://ecommerce.routemisr.com/Route-Academy-categories/1681511818071.jpeg"
+    },
+    "ratingsAverage": 4.8,
+    "ratingsQuantity": 5,
+    "createdAt": {
+      "$date": "2023-04-02T02:14:33.277Z"
+    },
+    "updatedAt": {
+      "$date": "2025-04-17T17:05:28.275Z"
+    },
+    "adminId":"68112dff5715ea9af287ec7b"
+  }
+]

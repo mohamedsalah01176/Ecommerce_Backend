@@ -1,4 +1,5 @@
 import CategoryModel from "../model/category";
+import ProductModel from "../model/product";
 
 export default class CategoriesService{
     async handleGetAllCategory(){
@@ -16,9 +17,9 @@ export default class CategoriesService{
             }
         }
     }
-    async handleSpecificCategory(id:string){
+    async handleSpecificCategory(name:string){
         try{
-            let category=await CategoryModel.find({_id:id});
+            let category=await ProductModel.find({'category.name':name});
             return{
                 status:'success',
                 category

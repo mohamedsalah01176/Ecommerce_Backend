@@ -47,7 +47,8 @@ export default class ProductService{
     async handleAddProduct(body:IProduct,token:string){
         try{
             let user:any=  jwt.verify(token,process.env.TOKEN_SECRET as string)
-            console.log(user)
+            console.log(user.role,"ddddddd")
+            // if(user.r)
             let newProduct=new ProductModel({...body,adminId:user.userID  })
             await newProduct.save();
             return{
