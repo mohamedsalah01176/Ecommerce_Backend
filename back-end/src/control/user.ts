@@ -34,7 +34,6 @@ export default class UserControl {
           status: "success",
           message: result.message,
           token: result.token,
-
         });
       } else {
         res.status(401).json({
@@ -131,6 +130,61 @@ export default class UserControl {
         oldPassword,
         newPassword,
       });
+      const statusCode = result.status === "fail" ? 400 : 200;
+      res.status(statusCode).json(result);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
+      next(error);
+    }
+  }
+  async forgetPasswordController(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const { email } = req.body;
+
+    try {
+      const result = await this.userService.forgetPassword(email);
+      if (!result) {
+        res
+          .status(500)
+          .json({ status: "error", message: "No result returned" });
+        return;
+      }
+      const statusCode = result.status === "fail" ? 400 : 200;
+      res.status(statusCode).json(result);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
+      next(error);
+    }
+  }
+
+  async forgetPasswordVerificationController(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const { email, providedCode, newPassword } = req.body;
+
+    try {
+      const result = await this.userService.verifyForgetPassword(
+        email,
+        providedCode,
+        newPassword
+      );
+      if (!result) {
+        res
+          .status(500)
+          .json({ status: "error", message: "No result returned" });
+        return;
+      }
       const statusCode = result.status === "fail" ? 400 : 200;
       res.status(statusCode).json(result);
     } catch (error) {

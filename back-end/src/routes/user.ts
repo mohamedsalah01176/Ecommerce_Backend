@@ -24,5 +24,13 @@ router.patch(
   "/change-password",
   userControl.changePasswordController.bind(userControl)
 );
+router.patch(
+  "/forget-password",
+  userControl.forgetPasswordController.bind(userControl)
+);
+router.patch(
+  "/forget-password-verification",
+  userControl.forgetPasswordVerificationController.bind(userControl)
+);
 
 export default router;

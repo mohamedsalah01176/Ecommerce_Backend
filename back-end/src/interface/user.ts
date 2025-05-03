@@ -7,6 +7,6 @@ export interface IUser {
   verified: boolean;
   verificationCode: string | undefined;
   verificationCodeValidation: number | undefined;
-  forgetPasswordCode: string;
-  forgetPasswordCodeValidation: number;
+  forgetPasswordCode: string | undefined;
+  forgetPasswordCodeValidation: number | undefined;
 }
