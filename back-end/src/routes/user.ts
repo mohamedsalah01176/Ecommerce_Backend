@@ -16,5 +16,13 @@ router.patch(
   "/verification-code",
   userControl.sendVerificationCodeController.bind(userControl)
 );
+router.patch(
+  "/verification",
+  userControl.acceptCodeController.bind(userControl)
+);
+router.patch(
+  "/change-password",
+  userControl.changePasswordController.bind(userControl)
+);
 
 export default router;

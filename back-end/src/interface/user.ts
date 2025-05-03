@@ -5,8 +5,8 @@ export interface IUser {
   phone: string;
   role: "user" | "admin";
   verified: boolean;
-  verificationCode: string;
-  verificationCodeValidation: number;
+  verificationCode: string | undefined;
+  verificationCodeValidation: number | undefined;
   forgetPasswordCode: string;
   forgetPasswordCodeValidation: number;
 }

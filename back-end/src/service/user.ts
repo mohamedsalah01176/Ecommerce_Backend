@@ -178,4 +178,130 @@ export default class UserService {
       };
     }
   }
+  async verfiycode(email: string, providedCode: string) {
+    try {
+      const { error, value } = schemas.acceptCodeSchema.validate({
+        email,
+        providedCode,
+      });
+      if (error) {
+        return {
+          status: "fail",
+          message: error.details[0].message,
+        };
+      }
+      const codeValue = providedCode.toString();
+      const existUser = await User.findOne({ email }).select(
+        "+verificationCodeValidation +verificationCode"
+      );
+      if (!existUser) {
+        return {
+          status: "fail",
+          message: "user does not exist!",
+        };
+      }
+      if (existUser.verified) {
+        return {
+          status: "fail",
+          message: "You are already verified!",
+        };
+      }
+      if (
+        !existUser.verificationCode ||
+        !existUser.verificationCodeValidation
+      ) {
+        return {
+          status: "fail",
+          message: "something is wrong with code!",
+        };
+      }
+      if (Date.now() - existUser.verificationCodeValidation > 5 * 60 * 1000) {
+        return {
+          status: "fail",
+          message: "Code has expired!",
+        };
+      }
+      const hashedCodevalue = await myHash.hmacProcess(
+        codeValue,
+        process.env.VERIFICATION_CODE_SECRET as string
+      );
+      if (hashedCodevalue !== existUser.verificationCode) {
+        return {
+          status: "fail",
+          message: "Invalid verification code",
+        };
+      }
+      if (hashedCodevalue === existUser.verificationCode) {
+        existUser.verified = true;
+        existUser.verificationCode = undefined;
+        existUser.verificationCodeValidation = undefined;
+        await existUser.save();
+        return {
+          status: "success",
+          message: "Verification successful",
+        };
+      }
+      return {
+        status: "fail",
+        message: "Invalid verification code",
+      };
+    } catch (error) {
+      console.log("verification error: ", error);
+    }
+  }
+  async changePassword(user: {
+    email: string;
+    oldPassword: string;
+    newPassword: string;
+  }) {
+    const { email, oldPassword, newPassword } = user;
+
+    try {
+      const { error } = schemas.changePasswordSchema.validate({
+        email,
+        oldPassword,
+        newPassword,
+      });
+
+      if (error) {
+        return {
+          status: "fail",
+          message: error.details[0].message,
+        };
+      }
+
+      const existUser = await User.findOne({ email }).select("password");
+      if (!existUser) {
+        return {
+          status: "fail",
+          message: "User does not exist",
+        };
+      }
+
+      const isValidPassword = await hashpass.hashValidation(
+        oldPassword,
+        existUser.password
+      );
+      if (!isValidPassword) {
+        return {
+          status: "fail",
+          message: "Current password is incorrect",
+        };
+      }
+
+      const hashedNewPassword = await hashpass.hashPassword(newPassword, 10);
+      existUser.password = hashedNewPassword;
+      await existUser.save();
+
+      return {
+        status: "success",
+        message: "Password changed successfully",
+      };
+    } catch (err) {
+      return {
+        status: "error",
+        message: "Internal server error",
+      };
+    }
+  }
 }
