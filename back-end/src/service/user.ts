@@ -108,7 +108,7 @@ export default class UserService {
       return {
         status: "success",
         message: "Login successful",
-        token,
+        token: token,
       };
     } catch (err) {
       return {
