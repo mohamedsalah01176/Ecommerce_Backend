@@ -2,3 +2,6 @@ http://localhost:4000/api/auth/signup => to register
 http://localhost:4000/api/auth/signin => to login
 http://localhost:4000/api/auth/signout => to logout
 http://localhost:4000/api/auth/verification-code => to email verification
+http://localhost:4000/api/auth/verification => to make the gmail verified
+
+http://localhost:4000/api/auth/change-password => to change password

@@ -97,4 +97,48 @@ export default class UserControl {
       next(error);
     }
   }
+  async acceptCodeController(req: Request, res: Response, next: NextFunction) {
+    const { email, providedCode } = req.body;
+
+    try {
+      const result = await this.userService.verfiycode(email, providedCode);
+      if (!result) {
+        res
+          .status(500)
+          .json({ status: "error", message: "No result returned" });
+        return;
+      }
+      const statusCode = result.status === "fail" ? 400 : 200;
+      res.status(statusCode).json(result);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
+      next(error);
+    }
+  }
+  async changePasswordController(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const { email, oldPassword, newPassword } = req.body;
+
+    try {
+      const result = await this.userService.changePassword({
+        email,
+        oldPassword,
+        newPassword,
+      });
+      const statusCode = result.status === "fail" ? 400 : 200;
+      res.status(statusCode).json(result);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
+      next(error);
+    }
+  }
 }
