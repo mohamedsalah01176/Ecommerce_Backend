@@ -304,4 +304,128 @@ export default class UserService {
       };
     }
   }
+  async forgetPassword(user: IUser) {
+    console.log(user);
+
+    try {
+      const existUser = await User.findOne({ email: user });
+      console.log("Found user:", existUser);
+
+      if (!existUser) {
+        return {
+          status: "fail",
+          message: "User does not exist",
+        };
+      }
+      const verificationCodevalue = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
+
+      const info = await transport.sendMail({
+        from: process.env.SEND_EMAIL_ADDRESS,
+        to: existUser.email,
+        subject: "forget password Code ",
+        html: `<h1>${verificationCodevalue}</h1>`,
+      });
+      const secret = process.env.VERIFICATION_CODE_SECRET;
+      if (info.accepted[0] === existUser.email) {
+        const hashedCodevalue = await myHash.hmacProcess(
+          verificationCodevalue,
+          secret as string
+        );
+
+        existUser.forgetPasswordCode = hashedCodevalue;
+        existUser.forgetPasswordCodeValidation = Date.now() + 10 * 60 * 1000;
+        await existUser.save();
+
+        return {
+          status: "success",
+          message: "Verification code sent",
+        };
+      }
+
+      return {
+        status: "fail",
+        message: "Verification code not sent",
+      };
+    } catch (error) {
+      console.error("Verification error:", error);
+      return {
+        status: "error",
+        message: "Internal server error",
+      };
+    }
+  }
+
+  async verifyForgetPassword(
+    email: string,
+    providedCode: string,
+    newPassword: string
+  ) {
+    try {
+      const { error, value } = schemas.acceptForgetPasswordCodeSchema.validate({
+        email,
+        providedCode,
+        newPassword,
+      });
+      if (error) {
+        return {
+          status: "fail",
+          message: error.details[0].message,
+        };
+      }
+      const codeValue = providedCode.toString();
+      const existUser = await User.findOne({ email }).select(
+        "+forgetPasswordCodeValidation +forgetPasswordCode"
+      );
+      if (!existUser) {
+        return {
+          status: "fail",
+          message: "user does not exist!",
+        };
+      }
+
+      if (
+        !existUser.forgetPasswordCode ||
+        !existUser.forgetPasswordCodeValidation
+      ) {
+        return {
+          status: "fail",
+          message: "something is wrong with code!",
+        };
+      }
+      if (Date.now() - existUser.forgetPasswordCodeValidation > 5 * 60 * 1000) {
+        return {
+          status: "fail",
+          message: "Code has expired!",
+        };
+      }
+      const hashedCodevalue = await myHash.hmacProcess(
+        codeValue,
+        process.env.VERIFICATION_CODE_SECRET as string
+      );
+      if (hashedCodevalue !== existUser.forgetPasswordCode) {
+        return {
+          status: "fail",
+          message: "Invalid verification code",
+        };
+      }
+      if (hashedCodevalue === existUser.forgetPasswordCode) {
+        existUser.verified = true;
+        existUser.forgetPasswordCode = undefined;
+        existUser.forgetPasswordCodeValidation = undefined;
+        await existUser.save();
+        return {
+          status: "success",
+          message: "Verification successful",
+        };
+      }
+      return {
+        status: "fail",
+        message: "Invalid verification code",
+      };
+    } catch (error) {
+      console.log("verification error: ", error);
+    }
+  }
 }

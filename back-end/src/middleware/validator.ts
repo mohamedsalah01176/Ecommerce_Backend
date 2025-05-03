@@ -85,11 +85,31 @@ const changePasswordSchema = Joi.object({
       "string.pattern.base": "Password contains invalid characters",
     }),
 });
+const acceptForgetPasswordCodeSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .min(6)
+    .max(60)
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "net"] },
+    }),
+  providedCode: Joi.number().required(),
+  newPassword: Joi.string()
+    .min(6)
+    .max(30)
+    .pattern(new RegExp("^[a-zA-Z0-9@#$%^&+=!]*$"))
+    .required()
+    .messages({
+      "string.pattern.base": "Password contains invalid characters",
+    }),
+});
 const schemas = {
   signUpSchema,
   signInSchema,
   acceptCodeSchema,
   changePasswordSchema,
+  acceptForgetPasswordCodeSchema,
 };
 
 export default schemas;
