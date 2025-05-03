@@ -1,3 +1,108 @@
+import jwt  from 'jsonwebtoken';
+import { IProduct } from "../interface/product";
+import ProductModel from "../model/product";
+
 export default class ProductService{
     
+    constructor(){}
+    async handleGetAllProducts(){
+        try{
+            let products = await ProductModel.find({});
+            return{
+                status:"succes",
+                products
+            }
+        }
+        catch(errors){
+            return{
+                status:"fail",
+                errors
+            }
+            
+        }
+    }
+    async handleGetSpecificProduct(id:string){
+        try{
+            let product = await ProductModel.find({_id:id});
+            if(product.length>0){
+                return{
+                    status:"succes",
+                    product
+                }
+            }else{
+                return{
+                    status:"fail",
+                    message:"product not found"
+                }
+            }
+        }
+        catch(errors){
+            return{
+                status:"error",
+                errors
+            }
+            
+        }
+    }
+    async handleAddProduct(body:IProduct,token:string){
+        try{
+          console.log(token)
+            let user:any=  jwt.verify(token,process.env.TOKEN_SECRET as string)
+            console.log(user,"ddddddd")
+            let newProduct=new ProductModel({...body,adminId:user.userID ,createdAt:new Date()})
+
+            await newProduct.save();
+            return{
+                status:"success",
+                message:"product Addes"
+            }
+        }
+        catch(err){
+            return {
+                status:"error",
+                message:err
+            }
+        }
+    }
+    async handleDeleteProduct(id:string){
+        try{
+            await ProductModel.deleteOne({_id:id});
+            return {
+                status:"succes",
+                message:'prodect Deleted'
+            }
+        }
+        catch(errors){
+            return {
+                status:"error",
+                message:errors
+            }
+        }
+    }
+    async handleUpdateProduct(body:IProduct,id:string){
+      try{
+        
+        let product =await ProductModel.findByIdAndUpdate(id,{...body,updatedAt:new Date()},{
+          new:true,
+          runValidators:true
+        });
+        if(product){
+          return{
+            status:"success",
+            product
+          }
+        }else{
+          return{
+            status:"fail",
+            message:"Product Not Found"
+          }
+        }
+      }
+      catch(errors){
+        return{
+          status:"error",
+          errors
+        }
+      }
+    }
 }
