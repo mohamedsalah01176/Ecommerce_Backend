@@ -1,9 +1,8 @@
-
-
 export interface IProduct {
+  _id: string;
   title: Title;
   slug?: Slug;
-  sold:string,
+  sold: string;
   description: Slug;
   quantity: Quantity;
   price: Quantity;
