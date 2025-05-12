@@ -1,10 +1,9 @@
 import { compare, hash } from "bcrypt";
 import { createHmac } from "crypto";
-import { number, string } from "joi";
 
 const hashPassword = async (
   value: string,
-  saltRounds: number | string
+  saltRounds: number
 ): Promise<string> => {
   const result = await hash(value, saltRounds);
   return result;
@@ -25,7 +24,6 @@ const hashValidation = async (
 
 const hmacProcess = async (value: string, key: string): Promise<string> => {
   const result = createHmac("sha256", key).update(value).digest("hex");
-  console.log(result);
   return result;
 };
 

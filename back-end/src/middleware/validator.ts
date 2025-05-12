@@ -86,6 +86,14 @@ const changePasswordSchema = Joi.object({
     }),
 });
 const acceptForgetPasswordCodeSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .min(6)
+    .max(60)
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "net"] },
+    }),
   providedCode: Joi.number().required(),
   newPassword: Joi.string()
     .min(6)
