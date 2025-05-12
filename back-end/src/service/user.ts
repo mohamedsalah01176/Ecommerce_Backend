@@ -81,6 +81,8 @@ export default class UserService {
       const existUser = await User.findOne({ email }).select(
         "password email verified"
       );
+
+      const existUser = await User.findOne({ email });
       if (!existUser) {
         return {
           status: "fail",
@@ -102,7 +104,9 @@ export default class UserService {
       const token = jwt.sign(
         {
           userID: existUser._id,
+          userName: existUser.username,
           email: existUser.email,
+          role: existUser.role,
           verified: existUser.verified,
         },
         process.env.TOKEN_SECRET as string,

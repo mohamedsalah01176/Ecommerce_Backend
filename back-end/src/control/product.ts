@@ -1,5 +1,8 @@
+import { Comment } from "./../interface/product";
 import { Request, Response } from "express";
 import ProductService from "../service/product";
+import { IProduct } from "../interface/product";
+import ProductModel from "../model/product";
 
 export default class ProductControl {
   constructor(private productService: ProductService) {}
@@ -27,6 +30,7 @@ export default class ProductControl {
     let body = req.body;
     let token = req.headers["authorization"] as string;
     let resSer = await this.productService.handleAddProduct(body, token);
+
     console.log(token);
     if (resSer.status == "success") {
       res.status(200).send(resSer);
@@ -51,6 +55,269 @@ export default class ProductControl {
       res.status(500).send(resSer);
     } else {
       res.status(200).send(resSer);
+
+    if (resSer.status == "error") {
+      res.status(500).send(resSer);
+    } else {
+      res.status(200).send(resSer);
+    }
+  }
+
+  async deleteProduct(req: Request, res: Response): Promise<void> {
+    let id = req.params.id;
+
+    if (req.user.role !== "admin") {
+      res.status(403).send({
+        status: "Error",
+        message: "You are not authorized to access this resource!",
+      });
+      return;
+    }
+
+    const product = await this.productService.handleGetSpecificProduct(id);
+    const productList = product.product as IProduct[];
+
+    if (!productList || productList.length === 0) {
+      res.status(404).send({
+        status: "Error",
+        message: "Product not found",
+      });
+      return;
+    }
+
+    if (productList[0]?.adminId?.toString() !== req.user.userID) {
+      res.status(401).send({
+        status: "Error",
+        message: "You are not authorized to delete this product",
+      });
+      return;
+    }
+
+    const deleteRes = await this.productService.handleDeleteProduct(id);
+
+    if (deleteRes.status == "error") {
+      res.status(500).send(deleteRes);
+    } else {
+      res.status(200).send(deleteRes);
+    }
+  }
+
+  async updateProduct(req: Request, res: Response) {
+    let id = req.params.id;
+
+    if (req.user.role !== "admin") {
+      res.status(403).send({
+        status: "Error",
+        message: "You are not authorized to access this resource!",
+      });
+      return;
+    }
+
+    const product = await this.productService.handleGetSpecificProduct(id);
+    const productList = product.product as IProduct[];
+
+    if (!productList || productList.length === 0) {
+      res.status(404).send({
+        status: "Error",
+        message: "Product not found",
+      });
+      return;
+    }
+
+    if (productList[0]?.adminId?.toString() !== req.user.userID) {
+      res.status(401).send({
+        status: "Error",
+        message: "You are not authorized to delete this product",
+      });
+      return;
+    }
+
+    const body = req.body;
+    const updateRes = await this.productService.handleUpdateProduct(body, id);
+
+    if (updateRes.status == "error") {
+      res.status(500).send(updateRes);
+    } else if (updateRes.status == "fail") {
+      res.status(404).send(updateRes);
+    } else {
+      res.status(200).send(updateRes);
+    }
+  }
+
+  async addComment(req: Request, res: Response): Promise<void> {
+    let productId = req.params.id;
+
+    const Comment: Comment = {
+      userId: req.user.userID,
+      comment: req.body.comment,
+      userName: req.user.userName,
+      createdAt: new Date(),
+      userImage: "https://placehold.co/60?text=User",
+    };
+
+    try {
+      const updateRes = await ProductModel.findByIdAndUpdate(
+        productId,
+        {
+          $push: { Comments: Comment },
+          $set: { updatedAt: new Date() },
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      if (updateRes) {
+        res.status(200).json({
+          status: "success",
+          message: "Comment added successfully",
+          data: updateRes,
+        });
+        return;
+      } else {
+        res.status(404).json({
+          status: "fail",
+          message: "Product not found",
+        });
+        return;
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Error adding comment" });
+      return;
+    }
+  }
+
+  async getAllComments(req: Request, res: Response): Promise<void> {
+    let productId = req.params.id;
+
+    try {
+      const product = await ProductModel.findById(productId).select("Comments");
+
+      if (!product) {
+        res.status(404).json({
+          status: "fail",
+          message: "Product not found",
+        });
+        return;
+      } else {
+        res.status(200).json({
+          status: "success",
+          data: product,
+        });
+        return;
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching comments" });
+    }
+  }
+
+  async updateComment(req: Request, res: Response): Promise<void> {
+    let commentId = req.params.commentId;
+    let productId = req.params.id;
+    let comment = req.body.comment;
+
+    try {
+      const product = await ProductModel.findById(productId);
+
+      if (!product) {
+        res.status(404).json({
+          status: "fail",
+          message: "Product not found",
+        });
+        return;
+      }
+
+      const commentsArray = Array.isArray(product.Comments)
+        ? product.Comments
+        : [];
+
+      const commentToUpdate = commentsArray.find(
+        (comment: any) => comment._id.toString() === commentId
+      );
+
+      if (!commentToUpdate) {
+        res.status(404).json({
+          status: "fail",
+          message: "Comment not found",
+        });
+        return;
+      }
+
+      if (commentToUpdate.userId.toString() !== req.user.userID) {
+        res.status(401).json({
+          status: "fail",
+          message: "You are not authorized to update this comment",
+        });
+        return;
+      }
+
+      commentToUpdate.comment = comment;
+      commentToUpdate.updatedAt = new Date();
+
+      await product.save();
+      res.status(200).json({
+        status: "success",
+        message: "Comment updated successfully",
+        data: product.Comments,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error updating comment" });
+    }
+  }
+  async deleteComment(req: Request, res: Response): Promise<void> {
+    let commentId = req.params.commentId;
+    let productId = req.params.id;
+
+    try {
+      const product = await ProductModel.findById(productId);
+      if (!product) {
+        res.status(404).json({
+          status: "fail",
+          message: "Product not found",
+        });
+        return;
+      }
+
+      const commentsArray = Array.isArray(product.Comments)
+        ? product.Comments
+        : [];
+
+      const commentToDelete = commentsArray.find(
+        (comment: any) => comment._id.toString() === commentId
+      );
+      if (!commentToDelete) {
+        res.status(404).json({
+          status: "fail",
+          message: "Comment not found",
+        });
+        return;
+      }
+
+      if (commentToDelete.userId.toString() !== req.user.userID) {
+        res.status(401).json({
+          status: "fail",
+          message: "You are not authorized to update this comment",
+        });
+        return;
+      }
+
+      const updatedComments = commentsArray.filter(
+        (comment: any) => comment._id.toString() !== commentId
+      );
+
+      product.Comments = updatedComments;
+
+      await product.save();
+
+      res.status(200).json({
+        status: "success",
+        message: "Comment deleted successfully",
+        data: product.Comments,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting comment" });
+
     }
   }
 }
