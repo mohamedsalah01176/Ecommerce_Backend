@@ -38,13 +38,13 @@ const verifyToken: RequestHandler = (req, res, next) => {
       process.env.TOKEN_SECRET
     ) as jwt.JwtPayload;
 
-    if (decoded.role !== "admin") {
-      res.status(403).send({
-        status: "Error",
-        message: "You are not authorized to access this resource!",
-      });
-      return;
-    }
+    // if (decoded.role !== "admin") {
+    //   res.status(403).send({
+    //     status: "Error",
+    //     message: "You are not authorized to access this resource!",
+    //   });
+    //   return;
+    // }
 
     req.user = decoded;
     next();

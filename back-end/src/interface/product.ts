@@ -16,6 +16,7 @@ export interface IProduct {
   isWachList?: IsWachList;
   createdAt: CreatedAt;
   updatedAt: Slug;
+  Comments?: Comment[];
 }
 
 interface CreatedAt {
@@ -62,4 +63,17 @@ interface Slug {
 interface Title {
   type: string;
   minlength: (number | string)[];
+}
+
+// export interface ProductComment {
+//   // productId: string;
+//   Comments: Comment[];
+// }
+export interface Comment {
+  userId: string;
+  comment: string;
+  userName?: string;
+  createdAt: Date;
+  userImage?: string;
+  updatedAt?: Date;
 }

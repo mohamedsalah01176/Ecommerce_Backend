@@ -41,12 +41,22 @@ export default class ProductService {
   }
   async handleAddProduct(body: IProduct, token: string) {
     try {
-      let decodedToken = token.split(" ")[1];
-      let user: any = jwt.verify(decodedToken, process.env.TOKEN_SECRET as string);
+      let tokenPart = token.split(" ")[1];
+      let decodedToken = jwt.verify(
+        tokenPart,
+        process.env.TOKEN_SECRET as string
+      ) as { role: string; userID: string };
+
+      if (decodedToken.role !== "admin") {
+        return {
+          status: "Error",
+          message: "You are not authorized to access this resource!",
+        };
+      }
 
       let newProduct = new ProductModel({
         ...body,
-        adminId: user.userID,
+        adminId: decodedToken.userID,
         createdAt: new Date(),
       });
 

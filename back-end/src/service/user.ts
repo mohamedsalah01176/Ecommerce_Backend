@@ -92,6 +92,7 @@ export default class UserService {
       const token = jwt.sign(
         {
           userID: existUser._id,
+          userName: existUser.username,
           email: existUser.email,
           role: existUser.role,
           verified: existUser.verified,
