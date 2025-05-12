@@ -9,6 +9,7 @@ import authUser from "./routes/user";
 import feedbackRouter from "./routes/feedback";
 import productRouter from "./routes/produtc";
 import categoriesRouter from "./routes/categories";
+import orderRouter from "./routes/order";
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/auth", authUser);
 app.use("/api", feedbackRouter);
 app.use("/api", productRouter);
 app.use("/api", categoriesRouter);
+app.use("/api", orderRouter);
 
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;

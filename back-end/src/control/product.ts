@@ -25,7 +25,7 @@ export default class ProductControl{
     }
     async addProduct(req:Request,res:Response){
         let body=req.body;
-        let token= req.headers['authorization'] as string;
+        let token= (req.headers['authorization'] as string).split(" ")[1];
         let resSer=await this.productService.handleAddProduct(body,token);
         if(resSer.status == "error"){
             res.status(500).send(resSer)
