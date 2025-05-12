@@ -171,11 +171,10 @@ export default class UserControl {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    const { email, providedCode, newPassword } = req.body;
+    const { providedCode, newPassword } = req.body;
 
     try {
       const result = await this.userService.verifyForgetPassword(
-        email,
         providedCode,
         newPassword
       );

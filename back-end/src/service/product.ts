@@ -41,6 +41,14 @@ export default class ProductService {
   }
   async handleAddProduct(body: IProduct, token: string) {
     try {
+
+      let user: any = jwt.verify(token, process.env.TOKEN_SECRET as string);
+      console.log(process.env.TOKEN_SECRET);
+
+      let newProduct = new ProductModel({
+        ...body,
+        adminId: user.userID,
+
       let tokenPart = token.split(" ")[1];
       let decodedToken = jwt.verify(
         tokenPart,
@@ -57,14 +65,19 @@ export default class ProductService {
       let newProduct = new ProductModel({
         ...body,
         adminId: decodedToken.userID,
+
         createdAt: new Date(),
       });
 
       await newProduct.save();
       return {
         status: "success",
+
+        message: "product Addes",
+
         message: "product Added",
         data: newProduct,
+
       };
     } catch (err) {
       return {
@@ -78,7 +91,9 @@ export default class ProductService {
       await ProductModel.deleteOne({ _id: id });
       return {
         status: "succes",
+        message: "prodect Deleted",
         message: "prodect Deleted Successfully",
+
       };
     } catch (errors) {
       return {
