@@ -22,7 +22,7 @@ router.patch("/product/:id", verifyToken, (req, res) =>
 router.delete("/product/:id", verifyToken, (req, res) =>
   productControl.deleteProduct(req, res)
 );
-
+// Comments
 router
   .route("/product/comment/:id")
   .post(verifyToken, productControl.addComment)

@@ -71,20 +71,12 @@ export default class UserService {
         password,
       });
 
-      if (error) {
-        return {
-          status: "fail",
-          message: error.details[0].message,
-        };
-      }
+      const existUser = await User.findOne({ email });
 
-      const existUser = await User.findOne({ email }).select(
-        "password email verified"
-      );
       if (!existUser) {
         return {
           status: "fail",
-          message: "User does not exist",
+          message: "user is not Exist",
         };
       }
 
@@ -95,7 +87,7 @@ export default class UserService {
       if (!result) {
         return {
           status: "fail",
-          message: "Invalid credentials",
+          message: "ivalid credential",
         };
       }
 
@@ -105,25 +97,27 @@ export default class UserService {
           email: existUser.email,
           verified: existUser.verified,
         },
-        process.env.TOKEN_SECRET as string,
-        { expiresIn: "1h" }
+        process.env.TOKEN_SECRET as string
       );
-      console.log(process.env.TOKEN_SECRET);
+
+      if (error) {
+        return {
+          status: "fail",
+          message: error.details[0].message,
+        };
+      }
       return {
         status: "success",
         message: "Login successful",
         token: token,
-        userID: existUser._id,
       };
     } catch (err) {
-      console.error("SignIn Error:", err);
       return {
         status: "error",
-        message: "Internal server error",
+        message: "internal server error",
       };
     }
   }
-
   async signout(): Promise<{ message: string }> {
     return { message: "Successfully signed out" };
   }
@@ -365,33 +359,14 @@ export default class UserService {
     }
   }
 
-  /**
-   * Verifies the provided code for password reset and updates the password if valid.
-   *
-   * @param providedCode - The verification code provided by the user for password reset
-   * @param newPassword - The new password to be set after successful verification
-   *
-   * @returns A response object with status and message
-   * - Success: {status: "success", message: "Verification successful"}
-   * - Validation Failure: {status: "fail", message: [validation error message]}
-   * - Code Mismatch: {status: "fail", message: "Invalid verification code"}
-   * - User Not Found: {status: "fail", message: "user does not exist!"}
-   * - Code Issues: {status: "fail", message: "something is wrong with code!"}
-   * - Expired Code: {status: "fail", message: "Code has expired!"}
-   * - Server Error: {status: "error", message: "Internal server error"}
-   *
-   * @throws May throw errors during database operations or hashing
-   *
-   * Process:
-   * 1. Validates input using acceptForgetPasswordCodeSchema
-   * 2. Hashes the provided code using HMAC
-   * 3. Finds user with matching hashed code
-   * 4. Verifies code validity and expiration (5 minutes)
-   * 5. Updates password and clears verification data if successful
-   */
-  async verifyForgetPassword(providedCode: string, newPassword: string) {
+  async verifyForgetPassword(
+    email: string,
+    providedCode: string,
+    newPassword: string
+  ) {
     try {
-      const { error } = schemas.acceptForgetPasswordCodeSchema.validate({
+      const { error, value } = schemas.acceptForgetPasswordCodeSchema.validate({
+        email,
         providedCode,
         newPassword,
       });
@@ -402,19 +377,16 @@ export default class UserService {
         };
       }
       const codeValue = providedCode.toString();
-      const hashedCodevalue = await myHash.hmacProcess(
-        codeValue,
-        process.env.VERIFICATION_CODE_SECRET as string
+      const existUser = await User.findOne({ email }).select(
+        "+forgetPasswordCodeValidation +forgetPasswordCode"
       );
-      const existUser = await User.findOne({
-        forgetPasswordCode: hashedCodevalue,
-      }).select("+forgetPasswordCodeValidation +forgetPasswordCode");
       if (!existUser) {
         return {
           status: "fail",
           message: "user does not exist!",
         };
       }
+
       if (
         !existUser.forgetPasswordCode ||
         !existUser.forgetPasswordCodeValidation
@@ -430,7 +402,10 @@ export default class UserService {
           message: "Code has expired!",
         };
       }
-
+      const hashedCodevalue = await myHash.hmacProcess(
+        codeValue,
+        process.env.VERIFICATION_CODE_SECRET as string
+      );
       if (hashedCodevalue !== existUser.forgetPasswordCode) {
         return {
           status: "fail",
@@ -439,8 +414,6 @@ export default class UserService {
       }
       if (hashedCodevalue === existUser.forgetPasswordCode) {
         existUser.verified = true;
-        existUser.password = await hashpass.hashPassword(newPassword, 10);
-
         existUser.forgetPasswordCode = undefined;
         existUser.forgetPasswordCodeValidation = undefined;
         await existUser.save();
@@ -455,10 +428,6 @@ export default class UserService {
       };
     } catch (error) {
       console.log("verification error: ", error);
-      return {
-        status: "error",
-        message: "Internal server error",
-      };
     }
   }
 }

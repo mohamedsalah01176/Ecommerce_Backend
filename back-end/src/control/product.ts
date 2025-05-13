@@ -30,32 +30,6 @@ export default class ProductControl {
     let body = req.body;
     let token = req.headers["authorization"] as string;
     let resSer = await this.productService.handleAddProduct(body, token);
-
-    console.log(token);
-    if (resSer.status == "success") {
-      res.status(200).send(resSer);
-    } else {
-      res.status(500).send(resSer);
-    }
-  }
-  async deleteProduct(req: Request, res: Response) {
-    let id = req.params.id;
-    let resSer = await this.productService.handleDeleteProduct(id);
-    if (resSer.status == "error") {
-      res.status(500).send(resSer);
-    } else {
-      res.status(200).send(resSer);
-    }
-  }
-  async updateProduct(req: Request, res: Response) {
-    let body = req.body;
-    let id = req.params.id;
-    let resSer = await this.productService.handleUpdateProduct(body, id);
-    if (resSer.status == "error") {
-      res.status(500).send(resSer);
-    } else {
-      res.status(200).send(resSer);
-
     if (resSer.status == "error") {
       res.status(500).send(resSer);
     } else {
@@ -317,7 +291,6 @@ export default class ProductControl {
       });
     } catch (error) {
       res.status(500).json({ message: "Error deleting comment" });
-
     }
   }
 }
