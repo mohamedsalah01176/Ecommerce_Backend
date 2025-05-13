@@ -70,30 +70,31 @@ export default class UserService {
         email,
         password,
       });
-      const existUser = await User.findOne({ email }).select("password");
+      const existUser = await User.findOne({ email });
       if (!existUser) {
         return {
           status: "fail",
           message: "user is not Exist",
         };
       }
-      console.log(existUser);
+
       const result = await hashpass.hashValidation(
         password,
         existUser.password
       );
-      console.log();
       if (!result) {
         return {
           status: "fail",
           message: "ivalid credential",
         };
       }
-      console.log(result);
+
       const token = jwt.sign(
         {
           userID: existUser._id,
+          userName: existUser.username,
           email: existUser.email,
+          role: existUser.role,
           verified: existUser.verified,
         },
         process.env.TOKEN_SECRET as string
