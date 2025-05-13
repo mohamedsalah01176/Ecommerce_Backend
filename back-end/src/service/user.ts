@@ -70,7 +70,9 @@ export default class UserService {
         email,
         password,
       });
+
       const existUser = await User.findOne({ email });
+
       if (!existUser) {
         return {
           status: "fail",
@@ -92,9 +94,7 @@ export default class UserService {
       const token = jwt.sign(
         {
           userID: existUser._id,
-          userName: existUser.username,
           email: existUser.email,
-          role: existUser.role,
           verified: existUser.verified,
         },
         process.env.TOKEN_SECRET as string
@@ -251,15 +251,14 @@ export default class UserService {
     }
   }
   async changePassword(user: {
-    email: string;
     oldPassword: string;
     newPassword: string;
+    _id: string;
   }) {
-    const { email, oldPassword, newPassword } = user;
+    const { oldPassword, newPassword } = user;
 
     try {
       const { error } = schemas.changePasswordSchema.validate({
-        email,
         oldPassword,
         newPassword,
       });
@@ -271,7 +270,9 @@ export default class UserService {
         };
       }
 
-      const existUser = await User.findOne({ email }).select("password");
+      // Using the JWT token to identify the user would be needed here
+      // This assumes you have the user ID from the JWT token in the request
+      const existUser = await User.findById(user._id).select("password");
       if (!existUser) {
         return {
           status: "fail",

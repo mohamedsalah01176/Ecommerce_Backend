@@ -3,6 +3,7 @@
 import { Router } from "express";
 import UserService from "../service/user";
 import UserControl from "../control/user";
+import authenticateJWT from "../middleware/identifyUser";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.patch(
 );
 router.patch(
   "/change-password",
+  authenticateJWT,
   userControl.changePasswordController.bind(userControl)
 );
 router.patch(
