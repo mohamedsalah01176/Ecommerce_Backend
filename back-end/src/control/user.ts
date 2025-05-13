@@ -122,11 +122,10 @@ export default class UserControl {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    const { email, oldPassword, newPassword } = req.body;
+    const {  oldPassword, newPassword } = req.body;
 
     try {
       const result = await this.userService.changePassword({
-        email,
         oldPassword,
         newPassword,
       });
