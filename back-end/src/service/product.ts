@@ -41,43 +41,19 @@ export default class ProductService {
   }
   async handleAddProduct(body: IProduct, token: string) {
     try {
-
       let user: any = jwt.verify(token, process.env.TOKEN_SECRET as string);
       console.log(process.env.TOKEN_SECRET);
 
       let newProduct = new ProductModel({
         ...body,
         adminId: user.userID,
-
-      let tokenPart = token.split(" ")[1];
-      let decodedToken = jwt.verify(
-        tokenPart,
-        process.env.TOKEN_SECRET as string
-      ) as { role: string; userID: string };
-
-      if (decodedToken.role !== "admin") {
-        return {
-          status: "Error",
-          message: "You are not authorized to access this resource!",
-        };
-      }
-
-      let newProduct = new ProductModel({
-        ...body,
-        adminId: decodedToken.userID,
-
         createdAt: new Date(),
       });
 
       await newProduct.save();
       return {
         status: "success",
-
         message: "product Addes",
-
-        message: "product Added",
-        data: newProduct,
-
       };
     } catch (err) {
       return {
@@ -92,8 +68,6 @@ export default class ProductService {
       return {
         status: "succes",
         message: "prodect Deleted",
-        message: "prodect Deleted Successfully",
-
       };
     } catch (errors) {
       return {

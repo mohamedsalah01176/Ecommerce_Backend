@@ -60,14 +60,6 @@ const acceptCodeSchema = Joi.object({
 });
 
 const changePasswordSchema = Joi.object({
-  email: Joi.string()
-    .required()
-    .min(6)
-    .max(60)
-    .email({
-      minDomainSegments: 2,
-      tlds: { allow: ["com", "net"] },
-    }),
   newPassword: Joi.string()
     .min(6)
     .max(30)
