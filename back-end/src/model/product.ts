@@ -1,76 +1,101 @@
 import mongoose from "mongoose";
 import { IProduct } from "../interface/product";
 
-let schema=new mongoose.Schema({
+let schema = new mongoose.Schema({
   title: {
     type: String,
     minlength: [2, "Title must be at least 2 characters."],
-    required:true
+    required: true,
   },
   sold:{
     type:Number,
     default:0
   },
   slug: {
-    type: String
+    type: String,
   },
   description: {
     type: String,
-    required:true,
+    required: true,
   },
   quantity: {
     type: Number,
     min: [0, "Quantity cannot be negative."],
-    required:true
+    required: true,
   },
   price: {
     type: Number,
     min: [0, "Price must be a positive number."],
-    required:true
+    required: true,
   },
   imageCover: {
-    type: String
+    type: String,
   },
   images: {
-    type: [String]
+    type: [String],
   },
   category: {
-    type: Object
+    type: Object,
   },
   brand: {
-    type: Object
+    type: Object,
   },
   ratingsAverage: {
     type: Number,
     default: 0,
     min: [0, "Rating must be at least 0."],
-    max: [5, "Rating cannot exceed 5."]
+    max: [5, "Rating cannot exceed 5."],
   },
   ratingsQuantity: {
     type: Number,
-    default: 0
+    default: 0,
   },
   adminId:{
     type:String,
     required:true
   },
-  isWachList:{
-    type:Boolean,
-    required:true,
-    default:false
+  isWachList: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
-    type: Date
+    type: Date,
   },
+  Comments: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+      },
+      comment: {
+        type: String,
+        required: true,
+      },
+      userName: {
+        type: String,
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      userImage: {
+        type: String,
+        default: "https://placehold.co/60?text=User",
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 });
 
-
-
-
-let ProductModel=mongoose.model<IProduct>('product',schema);
+let ProductModel = mongoose.model<IProduct>("product", schema);
 
 export default ProductModel;
