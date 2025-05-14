@@ -8,8 +8,8 @@ let schema=new mongoose.Schema({
     required:true
   },
   sold:{
-    type:String,
-    required:true
+    type:Number,
+    default:0
   },
   slug: {
     type: String
@@ -51,7 +51,7 @@ let schema=new mongoose.Schema({
     default: 0
   },
   adminId:{
-    type:mongoose.Schema.Types.ObjectId,
+    type:String,
     required:true
   },
   isWachList:{
@@ -65,7 +65,7 @@ let schema=new mongoose.Schema({
   },
   updatedAt: {
     type: Date
-  }
+  },
 });
 
 
