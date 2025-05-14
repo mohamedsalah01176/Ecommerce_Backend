@@ -2,10 +2,10 @@ export interface IProduct {
   _id: string;
   title: Title;
   slug?: Slug;
-  sold: string;
+  sold: number;
   description: Slug;
   quantity: Quantity;
-  price: Quantity;
+  price: number;
   imageCover?: Slug;
   images?: Images;
   category: Slug;

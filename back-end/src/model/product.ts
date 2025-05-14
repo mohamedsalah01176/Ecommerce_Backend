@@ -7,9 +7,9 @@ let schema = new mongoose.Schema({
     minlength: [2, "Title must be at least 2 characters."],
     required: true,
   },
-  sold: {
-    type: String,
-    required: true,
+  sold:{
+    type:Number,
+    default:0
   },
   slug: {
     type: String,
@@ -50,9 +50,9 @@ let schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  adminId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
+  adminId:{
+    type:String,
+    required:true
   },
   isWachList: {
     type: Boolean,
