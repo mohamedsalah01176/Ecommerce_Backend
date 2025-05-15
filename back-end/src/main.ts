@@ -11,6 +11,7 @@ import productRouter from "./routes/produtc";
 import categoriesRouter from "./routes/categories";
 import orderRouter from "./routes/order";
 import dashboardRouter from "./routes/dashboardRouter";
+import CustomerRouter from "./routes/customer";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api", productRouter);
 app.use("/api", categoriesRouter);
 app.use("/api", orderRouter);
 app.use("/api", dashboardRouter);
+app.use("/api", CustomerRouter);
 
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;
