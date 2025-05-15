@@ -96,6 +96,7 @@ export default class UserService {
           userID: existUser._id,
           email: existUser.email,
           verified: existUser.verified,
+          role:existUser.role
         },
         process.env.TOKEN_SECRET as string
       );

@@ -46,7 +46,7 @@ export default class ProductService {
         tokenPart,
         process.env.TOKEN_SECRET as string
       ) as { role: string; userID: string };
-
+      
       if (decodedToken.role !== "admin") {
         return {
           status: "Error",
