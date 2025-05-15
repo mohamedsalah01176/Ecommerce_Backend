@@ -10,8 +10,8 @@ const schema=new mongoose.Schema({
         type:Array,
         require:true
     },
-    userId:{
-        type:String,
+    userDetails:{
+        type:Object,
         require:true
     },
     adminsId:{

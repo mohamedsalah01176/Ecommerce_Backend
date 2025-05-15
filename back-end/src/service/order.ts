@@ -3,6 +3,7 @@ import { IOrder } from "../interface/order";
 import CustomerModel from "../model/customer";
 import OrderModel from "../model/order";
 import ProductModel from "../model/product";
+import UserModel from '../model/user';
 
 
 export default class OrderService{
@@ -149,16 +150,18 @@ export default class OrderService{
                 const order=await OrderModel.findOneAndDelete({_id:orderId})
                 if(order?.id){
                     const custometFound=await CustomerModel.findOne({userId:order.userId})
-                    console.log(custometFound,"llllll") 
+                    const userDetails=await UserModel.findOne({_id:order.userId})
+                    console.log(userDetails,"llllll") 
+                    console.log(order.adminsId,"bbbb") 
                     if(custometFound?._id){
                         await CustomerModel.updateOne({userId:order.userId},{$push:{orders:order}})
                     }else{
-                        const newCustomer=new CustomerModel({orders:order,adminIds:order.adminsId,userId:order.userId});
+                        const newCustomer=new CustomerModel({orders:order,adminsId:order.adminsId,userDetails});
                         await newCustomer.save()
                     }
                     return{
                         status:"success",
-                        message:"order Complated"
+                        message:"order Complated",
                     }
                 }else{
                     return{
