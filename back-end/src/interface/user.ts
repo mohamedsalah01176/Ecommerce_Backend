@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export interface IUser {
   username: string;
   email: string;
@@ -9,4 +11,5 @@ export interface IUser {
   verificationCodeValidation: number | undefined;
   forgetPasswordCode: string | undefined;
   forgetPasswordCodeValidation: number | undefined;
+  wishlist: Types.ObjectId[];
 }

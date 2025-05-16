@@ -1,11 +1,7 @@
 import { IUser } from "../interface/user";
-import signUpSchema from "../middleware/validator";
 import User from "../model/user";
-import bcrypt from "bcrypt";
-
 import schemas from "../middleware/validator";
 import jwt from "jsonwebtoken";
-
 import myHash from "../utils/hash";
 import hashpass from "../utils/hash";
 import transport from "../middleware/sendemail";
@@ -96,7 +92,7 @@ export default class UserService {
           userID: existUser._id,
           email: existUser.email,
           verified: existUser.verified,
-          role:existUser.role
+          role: existUser.role,
         },
         process.env.TOKEN_SECRET as string
       );
