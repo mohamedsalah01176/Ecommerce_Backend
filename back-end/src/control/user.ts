@@ -118,15 +118,21 @@ export default class UserControl {
     }
   }
   async changePasswordController(
-    req: Request,
+    req: Request & { user?: any },
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    const { email, oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body;
+    const _id = req.user?.userID;
+
+    if (!_id) {
+      res.status(401).json({ status: "fail", message: "Unauthorized" });
+      return;
+    }
 
     try {
       const result = await this.userService.changePassword({
-        email,
+        _id, // ✅ Now passing the user ID
         oldPassword,
         newPassword,
       });
@@ -140,6 +146,7 @@ export default class UserControl {
       next(error);
     }
   }
+
   async forgetPasswordController(
     req: Request,
     res: Response,

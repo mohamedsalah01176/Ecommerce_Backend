@@ -1,9 +1,9 @@
-import mongoose, { Schema } from "mongoose";
 import { IUser } from "../interface/user";
+import mongoose, { Schema, Types } from "mongoose";
 
 const UserSchema = new Schema(
   {
-    username: { type: String, required: true, pattern: "" },
+    username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phone: { type: String, required: true },
@@ -13,6 +13,13 @@ const UserSchema = new Schema(
     verificationCodeValidation: { type: Number, default: false },
     forgetPasswordCode: { type: String, default: false },
     forgetPasswordCodeValidation: { type: Number, default: false },
+    wishlist: [
+      {
+        type: Types.ObjectId,
+        ref: "product",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,
