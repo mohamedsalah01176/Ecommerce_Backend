@@ -10,6 +10,7 @@ import feedbackRouter from "./routes/feedback";
 import productRouter from "./routes/produtc";
 import categoriesRouter from "./routes/categories";
 import dashboardRouter from "./routes/dashboardRouter";
+import cartRouter from "./routes/cart";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api", feedbackRouter);
 app.use("/api", productRouter);
 app.use("/api", categoriesRouter);
 app.use("/api", dashboardRouter);
+app.use("/api", cartRouter);
 
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;
