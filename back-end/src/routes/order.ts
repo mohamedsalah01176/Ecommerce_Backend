@@ -7,9 +7,16 @@ const router = Router();
 const orderService = new OrderService();
 const orderControler = new OrderControler(orderService);
 
-router.post("/order", (req, res) => orderControler.createOrder(req, res));
-router.get("/order/:userId", (req, res) =>
-  orderControler.getOrdersForUser(req, res)
-);
+router.post("/order",(req,res)=>orderControler.createOrder(req,res))
+router.get("/order/:userId",(req,res)=>orderControler.getOrdersForUser(req,res))
+
+
+
+
+
+
+
+
+
 
 export default router;
