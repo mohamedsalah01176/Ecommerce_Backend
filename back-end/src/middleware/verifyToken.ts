@@ -22,7 +22,6 @@ const verifyToken: RequestHandler = (req, res, next) => {
   token = Array.isArray(token) ? token[0] : token;
   token = token.split(" ")[1];
  console.log(token);
-  token = token.split(" ")[1]; 
 
 
   if (!process.env.TOKEN_SECRET) {
