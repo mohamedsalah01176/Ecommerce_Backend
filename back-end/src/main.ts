@@ -12,6 +12,7 @@ import productRouter from "./routes/produtc";
 import categoriesRouter from "./routes/categories";
 import orderRouter from "./routes/order";
 import dashboardRouter from "./routes/dashboardRouter";
+import cartRouter from "./routes/cart";
 import CustomerRouter from "./routes/customer";
 import wishlistRouter from "./routes/wishList";
 const app = express();
@@ -33,8 +34,10 @@ app.use("/api", productRouter);
 app.use("/api", categoriesRouter);
 app.use("/api", orderRouter);
 app.use("/api", dashboardRouter);
+app.use("/api", cartRouter);
 app.use("/api", CustomerRouter);
 app.use("/api", wishlistRouter);
+
 
 const PORT = process.env.PORT;
 const MONGOURL = process.env.MONGOURL;

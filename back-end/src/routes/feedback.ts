@@ -9,13 +9,4 @@ let feedBackControls=new FeedBackControls(feedBackService)
 
 router.post('/feedback',(req,res)=>feedBackControls.createFeedBack(req,res))
 
-
-
-
-
-
-
-
-
-
 export default router;

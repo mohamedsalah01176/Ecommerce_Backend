@@ -20,7 +20,9 @@ const verifyToken: RequestHandler = (req, res, next) => {
   }
 
   token = Array.isArray(token) ? token[0] : token;
-  token = token.split(" ")[1]; // Bearer xxxxx
+  token = token.split(" ")[1];
+ console.log(token);
+
 
   if (!process.env.TOKEN_SECRET) {
     res.status(500).send({
