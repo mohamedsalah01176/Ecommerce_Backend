@@ -78,10 +78,10 @@ export default class OrderService{
             }
         }
         async handledeleteSpecificOrder(orderId:string,token:string){
-            let decodedToken = jwt.verify(token,process.env.TOKEN_SECRET as string) as { role: string; userID: string }
+            let decodedToken = jwt.verify(token,process.env.TOKEN_SECRET as string) as { role: string; userID: string };
             if(decodedToken.role =="user"){
             try{
-                console.log(decodedToken.userID)
+                // console.log(decodedToken.userID)
                 const order=await OrderModel.deleteOne({_id:orderId})
                 const remainingOrders = await OrderModel.find({ userId: decodedToken.userID });
 
