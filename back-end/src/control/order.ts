@@ -29,6 +29,7 @@ export default class OrderControler{
     async deleteSpecificOrder(req:Request,res:Response){
         const token=req.headers["authorization"]?.split(" ")[1] as string;
         const orderId:string=req.params.orderId;
+        console.log(token,"lllllllllllllllllll")
         const resSer=await this.orderService.handledeleteSpecificOrder(orderId,token);
         console.log(resSer)
         if(resSer.status == "success"){
