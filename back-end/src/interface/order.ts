@@ -5,6 +5,7 @@ export interface IOrder {
     phone: string;
   };
   userId: string;
+  userName: string;
   products: {
     _id: string;
     title: string;
@@ -12,6 +13,6 @@ export interface IOrder {
     quantity: number;
     adminId?: string;
   }[];
-  adminsId: string[];   // ✅ أضف هذا السطر
+  adminsId: string[]; // ✅ أضف هذا السطر
   total: number;
 }

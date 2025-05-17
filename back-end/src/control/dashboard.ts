@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import products from "../model/product";
+import UserModel from "../model/user";
 
 const getAdminProducts = async (req: Request, res: Response) => {
   let allProducts = await products.find({});
@@ -31,4 +32,21 @@ const getAdminProducts = async (req: Request, res: Response) => {
   }
 };
 
-export { getAdminProducts };
+const getUserData = async (req: Request, res: Response) => {
+  let userInfo = await UserModel.find({ _id: req.params.id });
+
+  if (!userInfo) {
+    res.status(404).json({
+      status: "fail",
+      message: "User Not found",
+    });
+    return;
+  } else {
+    res.status(200).json({
+      status: "success",
+      data: userInfo,
+    });
+  }
+};
+
+export { getAdminProducts, getUserData };

@@ -13,6 +13,7 @@ const UserSchema = new Schema(
     verificationCodeValidation: { type: Number, default: false },
     forgetPasswordCode: { type: String, default: false },
     forgetPasswordCodeValidation: { type: Number, default: false },
+    avatar: { type: String, default: "profile.png" },
     wishlist: [
       {
         type: Types.ObjectId,

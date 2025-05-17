@@ -76,6 +76,8 @@ export default class UserService {
         };
       }
 
+      console.log(existUser);
+
       const result = await hashpass.hashValidation(
         password,
         existUser.password
@@ -89,9 +91,11 @@ export default class UserService {
 
       const token = jwt.sign(
         {
+          userName: existUser.username,
           userID: existUser._id,
           email: existUser.email,
           verified: existUser.verified,
+          avatar: existUser.avatar,
           role: existUser.role,
         },
         process.env.TOKEN_SECRET as string

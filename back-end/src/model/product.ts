@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { IProduct } from "../interface/product";
+import { array } from "joi";
 
 let schema = new mongoose.Schema({
   title: {
@@ -7,9 +8,9 @@ let schema = new mongoose.Schema({
     minlength: [2, "Title must be at least 2 characters."],
     required: true,
   },
-  sold:{
-    type:Number,
-    default:0
+  sold: {
+    type: Number,
+    default: 0,
   },
   slug: {
     type: String,
@@ -50,9 +51,9 @@ let schema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  adminId:{
-    type:String,
-    required:true
+  adminId: {
+    type: String,
+    required: true,
   },
   isWachList: {
     type: Boolean,
@@ -84,10 +85,10 @@ let schema = new mongoose.Schema({
         type: Date,
         default: Date.now,
       },
-      userImage: {
-        type: String,
-        default: "https://placehold.co/60?text=User",
-      },
+      // avatar: {
+      //   type: String,
+      //   default: "profile.png",
+      // },
       updatedAt: {
         type: Date,
         default: Date.now,

@@ -6,6 +6,7 @@ export interface IUser {
   password: string;
   phone: string;
   role: "user" | "admin";
+  avatar: string;
   verified: boolean;
   verificationCode: string | undefined;
   verificationCodeValidation: number | undefined;
