@@ -5,12 +5,25 @@ import CouponModel from "../model/coupon";
 
 
 export default class CartService {
-  
 async handleAddToCart(productId: string, userId: string) {
-  const product = await ProductModel.findById(productId);
+  const product = await ProductModel.findById({_id:productId});
   if (!product) return { status: "fail", message: "Product not found" };
-
   let userCart = await CartModel.findOne({ userId });
+  console.log("userCart",userCart);
+  if (userCart) {
+    const existingProduct = userCart.products.find(
+      (p: any) => p.productId.toString() === productId
+    );
+    if (existingProduct) {
+      return { status: "fail", message: "Product already in cart" };
+    }
+    userCart.products.push({
+      productId,
+      quantity: 1,
+      price: Number(product.price),
+    });
+    await userCart.save();
+  }
   if (!userCart) {
     userCart = await CartModel.create({
       userId,
@@ -22,26 +35,10 @@ async handleAddToCart(productId: string, userId: string) {
         },
       ],
     });
-  } else {
-    const existingProduct = userCart.products.find(
-      (p: any) => p.productId.toString() === productId
-    );
-
-    if (existingProduct) {
-      return { status: "fail", message: "Product already in cart" };
-    }
-
-    userCart.products.push({
-      productId,
-      quantity: 1,
-      price: Number(product.price),
-    });
-
-    await userCart.save();
   }
-
   return { status: "success", message: "Product added to cart", cart: userCart };
 }
+
 
 
 
@@ -103,13 +100,12 @@ async handleUpdateQuantity(userId: string, productId: string, quantity: number) 
 
   // Clear all products from cart
 async handleClearCart(userId: string) {
-  const cart = await CartModel.findOne({ userId });
-  if (!cart) return { status: "fail", message: "Cart not found" };
-  cart.products = [];
-  await cart.save();
-  return { status: "success", message: "Cart cleared" };
+  const deletedCart = await CartModel.findOneAndDelete({ userId });
+  if (!deletedCart) {
+    return { status: "fail", message: "Cart not found" };
+  }
+  return { status: "success", message: "Cart deleted completely" };
 }
-
 
 
 
