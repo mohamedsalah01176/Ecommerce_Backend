@@ -21,6 +21,7 @@ export default class ProductService {
   async handleGetSpecificProduct(id: string) {
     try {
       let product = await ProductModel.find({ _id: id });
+
       if (product.length > 0) {
         return {
           status: "succes",
@@ -39,14 +40,14 @@ export default class ProductService {
       };
     }
   }
-  async handleAddProduct(body: IProduct, token: string) {
+  async handleAddProduct(body: IProduct, token: string, filenames: string[]) {
     try {
       let tokenPart = token.split(" ")[1];
       let decodedToken = jwt.verify(
         tokenPart,
         process.env.TOKEN_SECRET as string
       ) as { role: string; userID: string };
-      
+
       if (decodedToken.role !== "admin") {
         return {
           status: "Error",
@@ -54,9 +55,15 @@ export default class ProductService {
         };
       }
 
+      console.log("body", body);
+      console.log(filenames);
+      body.images = [...filenames];
+
       let newProduct = new ProductModel({
         ...body,
+        imageCover: filenames[0],
         adminId: decodedToken.userID,
+        category: { name: body.category },
         createdAt: new Date(),
       });
 
@@ -87,16 +94,56 @@ export default class ProductService {
       };
     }
   }
-  async handleUpdateProduct(body: IProduct, id: string) {
+  // async handleUpdateProduct(body: IProduct, id: string) {
+  //   console.log(body);
+
+  //   try {
+  //     let product = await ProductModel.findByIdAndUpdate(
+  //       id,
+  //       { ...body, category: { name: body.category }, updatedAt: new Date() },
+  //       {
+  //         new: true,
+  //         runValidators: true,
+  //       }
+  //     );
+  //     if (product) {
+  //       return {
+  //         status: "success",
+  //         product,
+  //       };
+  //     } else {
+  //       return {
+  //         status: "fail",
+  //         message: "Product Not Found",
+  //       };
+  //     }
+  //   } catch (errors) {
+  //     return {
+  //       status: "error",
+  //       errors,
+  //     };
+  //   }
+  // }
+
+  async handleUpdateProduct(body: any, id: string, filenames: string[]) {
     try {
+      console.log("filenames", filenames);
+      body.images = filenames;
+      body.imageCover = filenames[0];
       let product = await ProductModel.findByIdAndUpdate(
         id,
-        { ...body, updatedAt: new Date() },
+        {
+          ...body,
+
+          category: { name: body.category },
+          updatedAt: new Date(),
+        },
         {
           new: true,
           runValidators: true,
         }
       );
+
       if (product) {
         return {
           status: "success",

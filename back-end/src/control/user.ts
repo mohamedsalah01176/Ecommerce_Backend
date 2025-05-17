@@ -1,5 +1,7 @@
+import UserModel from "../model/user";
 import UserService from "../service/user";
 import { Response, Request, NextFunction } from "express";
+import hashpass from "../utils/hash";
 export default class UserControl {
   constructor(private userService: UserService) {}
 
@@ -200,6 +202,138 @@ export default class UserControl {
         .status(500)
         .json({ status: "error", message: "Internal server error" });
       next(error);
+    }
+  }
+
+  //#region old code for change user info but every thing sperated
+
+  // async changeEmail(req: Request, res: Response) {
+  //   const newEmail = req.body.email;
+  //   const oldEmail = req.user.email;
+
+  //   try {
+  //     const user = await UserModel.findOne({ email: oldEmail });
+  //     if (!user) {
+  //       res.status(404).json({ status: "fail", message: "User not found" });
+  //       return;
+  //     }
+  //     user.email = newEmail;
+  //     await user.save();
+  //     res.status(200).json({
+  //       status: "success",
+  //       message: "Email updated successfully",
+  //       data: user,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error updating email:", error);
+  //     res
+  //       .status(500)
+  //       .json({ status: "error", message: "Internal server error" });
+  //   }
+  // }
+
+  // async changeUsername(req: Request, res: Response) {
+  //   const newuserName = req.body.username;
+
+  //   try {
+  //     const user = await UserModel.findOne({ _id: req.user.userID });
+  //     if (!user) {
+  //       res.status(404).json({ status: "fail", message: "User not found" });
+  //       return;
+  //     }
+  //     user.username = newuserName;
+  //     await user.save();
+  //     res.status(200).json({
+  //       status: "success",
+  //       message: "User Name updated successfully",
+  //       data: user,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error updating User Name:", error);
+  //     res
+  //       .status(500)
+  //       .json({ status: "error", message: "Internal server error" });
+  //   }
+  // }
+
+  // async changePhone(req: Request, res: Response) {
+  //   const newPhone = req.body.phone;
+
+  //   try {
+  //     const user = await UserModel.findOne({ _id: req.user.userID });
+  //     if (!user) {
+  //       res.status(404).json({ status: "fail", message: "User not found" });
+  //       return;
+  //     }
+  //     user.phone = newPhone;
+  //     await user.save();
+  //     res.status(200).json({
+  //       status: "success",
+  //       message: "Phone updated successfully",
+  //       data: user,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error updating Phone:", error);
+  //     res
+  //       .status(500)
+  //       .json({ status: "error", message: "Internal server error" });
+  //   }
+  // }
+
+  //#endregion
+
+  async changeUserInfo(req: Request, res: Response) {
+    const newData = req.body;
+
+    if (req.file) {
+      newData.avatar = req.file?.filename;
+    } else if (req.body.oldAvatar) {
+      newData.avatar = req.body.oldAvatar;
+    }
+
+    try {
+      const user = await UserModel.findOne({ _id: req.user.userID });
+      if (!user) {
+        res.status(404).json({ status: "fail", message: "User not found" });
+        return;
+      }
+
+      if (newData.oldPassword) {
+        const isValidPassword = await hashpass.hashValidation(
+          newData.oldPassword,
+          user.password
+        );
+
+        if (!isValidPassword) {
+          res.status(404).json({
+            status: "fail",
+            message: "Old password is incorrect",
+          });
+          return;
+        }
+      }
+      delete newData.email;
+      Object.assign(user, newData);
+
+      if (newData.oldPassword) {
+        const hashedNewPassword = await hashpass.hashPassword(
+          newData.newPassword,
+          10
+        );
+        user.password = hashedNewPassword;
+      }
+
+      await user.save();
+      res.status(200).json({
+        status: "success",
+        message: "Phone updated successfully",
+        data: user,
+      });
+    } catch (error) {
+      console.error("Error updating Phone:", error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
     }
   }
 }

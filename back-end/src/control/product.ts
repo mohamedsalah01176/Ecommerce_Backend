@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import ProductService from "../service/product";
 import { IProduct } from "../interface/product";
 import ProductModel from "../model/product";
+import UserModel from "../model/user";
 
 export default class ProductControl {
   constructor(private productService: ProductService) {}
@@ -29,7 +30,24 @@ export default class ProductControl {
   async addProduct(req: Request, res: Response) {
     let body = req.body;
     let token = req.headers["authorization"] as string;
-    let resSer = await this.productService.handleAddProduct(body, token);
+    console.log(req.files);
+
+    // Extract filenames from req.files
+    let filenames: string[] = [];
+    if (Array.isArray(req.files)) {
+      filenames = req.files.map((file: any) => file.filename);
+    } else if (req.files && typeof req.files === "object") {
+      filenames = Object.values(req.files)
+        .flat()
+        .map((file: any) => file.filename);
+    }
+
+    let resSer = await this.productService.handleAddProduct(
+      body,
+      token,
+      filenames
+    );
+
     if (resSer.status == "error") {
       res.status(500).send(resSer);
     } else {
@@ -79,6 +97,16 @@ export default class ProductControl {
   async updateProduct(req: Request, res: Response) {
     let id = req.params.id;
 
+    // Extract filenames from req.files
+    let filenames: string[] = [];
+    if (Array.isArray(req.files)) {
+      filenames = req.files.map((file: any) => file.filename);
+    } else if (req.files && typeof req.files === "object") {
+      filenames = Object.values(req.files)
+        .flat()
+        .map((file: any) => file.filename);
+    }
+
     if (req.user.role !== "admin") {
       res.status(403).send({
         status: "Error",
@@ -107,7 +135,13 @@ export default class ProductControl {
     }
 
     const body = req.body;
-    const updateRes = await this.productService.handleUpdateProduct(body, id);
+    console.log("bodyyyyyyy", body);
+
+    const updateRes = await this.productService.handleUpdateProduct(
+      body,
+      id,
+      filenames
+    );
 
     if (updateRes.status == "error") {
       res.status(500).send(updateRes);
@@ -126,7 +160,6 @@ export default class ProductControl {
       comment: req.body.comment,
       userName: req.user.userName,
       createdAt: new Date(),
-      userImage: "https://placehold.co/60?text=User",
     };
 
     try {

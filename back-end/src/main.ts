@@ -1,3 +1,4 @@
+const path = require("path");
 import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
@@ -16,13 +17,14 @@ import CustomerRouter from "./routes/customer";
 import wishlistRouter from "./routes/wishList";
 const app = express();
 
-// cofigration
 dotenv.config();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Meddileware
 

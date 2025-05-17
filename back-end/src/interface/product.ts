@@ -7,7 +7,7 @@ export interface IProduct {
   quantity: Quantity;
   price: number;
   imageCover?: Slug;
-  images?: Images;
+  images?: string[];
   category: Slug;
   brand?: Slug;
   ratingsAverage?: RatingsAverage;
@@ -74,6 +74,6 @@ export interface Comment {
   comment: string;
   userName?: string;
   createdAt: Date;
-  userImage?: string;
+  avatar?: string;
   updatedAt?: Date;
 }
