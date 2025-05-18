@@ -97,14 +97,31 @@ export default class ProductControl {
   async updateProduct(req: Request, res: Response) {
     let id = req.params.id;
 
-    // Extract filenames from req.files
     let filenames: string[] = [];
-    if (Array.isArray(req.files)) {
+
+    if (Array.isArray(req.files) && req.files.length > 0) {
       filenames = req.files.map((file: any) => file.filename);
-    } else if (req.files && typeof req.files === "object") {
+    } else if (
+      req.files &&
+      typeof req.files === "object" &&
+      Object.keys(req.files).length > 0
+    ) {
       filenames = Object.values(req.files)
         .flat()
         .map((file: any) => file.filename);
+    } else {
+      const product = await this.productService.handleGetSpecificProduct(id);
+      const productList = product.product as IProduct[];
+
+      if (!productList || productList.length === 0) {
+        res.status(404).send({
+          status: "Error",
+          message: "Product not found",
+        });
+        return;
+      }
+
+      filenames = productList[0].images || [];
     }
 
     if (req.user.role !== "admin") {
@@ -135,7 +152,6 @@ export default class ProductControl {
     }
 
     const body = req.body;
-    console.log("bodyyyyyyy", body);
 
     const updateRes = await this.productService.handleUpdateProduct(
       body,
