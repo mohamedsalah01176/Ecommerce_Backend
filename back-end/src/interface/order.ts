@@ -14,6 +14,7 @@ export interface IOrder {
     productId:{
       price:number,
       adminId?: string;
+      _id:string;
     }
   }[];
   adminsId: string[]; // ✅ أضف هذا السطر

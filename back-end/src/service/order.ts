@@ -13,18 +13,19 @@ export default class OrderService{
     async handleCreateOrder(body:IOrder,token:string){
         let decodedToken = jwt.verify(token,process.env.TOKEN_SECRET as string) as { role: string; userID: string }
         if(decodedToken.role =="user"){
+            console.log(body,"jjjjjjjjjjjjj")
             let adminsId:string[]=[];
             let total:number=0;
             let products:{}[]=[]
             try{
                 for(let i=0;i<body.products.length;i++){
-                    await ProductModel.updateOne({_id:body.products[i]._id},{$inc:{sold:1}});
+                    await ProductModel.updateOne({_id:body.products[i].productId._id},{$inc:{sold:body.products[i].quantity,quantity:-body.products[i].quantity}});
                     const adminId = body.products[i].productId.adminId;
                     if (typeof adminId === 'string' && !adminsId.includes(adminId)) {
                         adminsId.push(adminId);
                     }
                     total+=Number(body.products[i].productId.price) * Number(body.products[i].quantity)
-                    products.push({...body.products[i].productId})
+                    products.push({...body.products[i].productId,quantity:body.products[i].quantity})
                 }
                 let body2={order_details:body.order_details,userId:decodedToken.userID,products};
                 const newOrder=new OrderModel({...body2,adminsId,total});
@@ -32,8 +33,10 @@ export default class OrderService{
                 const cart = await CartModel.findOne({ userId:decodedToken.userID });
 
                 if (!cart) return { status: "fail", message: "Cart not found" };
-                cart.products = [];
-                await cart.save();
+                await cart.deleteOne({ userId:decodedToken.userID})
+
+                // cart.products = [];
+                // await cart.save();
                 return{
                     status:"success",
                     message:"Order Created"
@@ -82,20 +85,21 @@ export default class OrderService{
             if(decodedToken.role =="user"){
             try{
                 // console.log(decodedToken.userID)
-                const order=await OrderModel.deleteOne({_id:orderId})
+                const order=await OrderModel.findOneAndDelete({_id:orderId});
+                if (!order) {
+                    return {
+                        status: "fail",
+                        message: "order not found"
+                    };
+                }
+                for(let i=0 ;i<order.products.length ;i++){
+                    await ProductModel.updateOne({_id:order.products[i]._id},{$inc:{sold:-order.products[i].quantity,quantity:order.products[i].quantity}});
+                }
                 const remainingOrders = await OrderModel.find({ userId: decodedToken.userID });
-
-                if(order.deletedCount>0){
-                    return{
-                        status:"success",
-                        message:"order deleted",
-                        remainingOrders
-                    }
-                }else{
-                    return{
-                        status:"fail",
-                        message:"order not found"
-                    }
+                return{
+                    status:"success",
+                    message:"order deleted",
+                    remainingOrders
                 }
             }
             catch(errors){
@@ -115,10 +119,15 @@ export default class OrderService{
         let decodedToken = jwt.verify(token,process.env.TOKEN_SECRET as string) as { role: string; userID: string }
         if(decodedToken.role =="user"){
             try{
-                console.log(userId)
-                const order=await OrderModel.deleteMany({userId:userId})
-                console.log(order);
-                if(order.deletedCount>0){
+                const orders= await OrderModel.find({userId:userId});
+                for(let order of orders){
+                    for(let product of order.products){
+                        await ProductModel.updateOne({_id:product._id},{$inc:{quantity:product.quantity,sold:-product.quantity}})
+                    }
+                }
+                const result=await OrderModel.deleteMany({userId:userId})
+                // console.log(order);
+                if(result.deletedCount>0){
                     return{
                         status:"success",
                         message:"order deleted"
