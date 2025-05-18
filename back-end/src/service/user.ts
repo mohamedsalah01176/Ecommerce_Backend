@@ -359,75 +359,58 @@ export default class UserService {
     }
   }
 
-  async verifyForgetPassword(
-    email: string,
-    providedCode: string,
-    newPassword: string
-  ) {
+  async verifyForgetPassword(providedCode: string, newPassword: string) {
     try {
-      const { error, value } = schemas.acceptForgetPasswordCodeSchema.validate({
-        email,
+      // Validate input
+      const { error } = schemas.acceptForgetPasswordCodeSchema.validate({
         providedCode,
         newPassword,
       });
       if (error) {
-        return {
-          status: "fail",
-          message: error.details[0].message,
-        };
-      }
-      const codeValue = providedCode.toString();
-      const existUser = await User.findOne({ email }).select(
-        "+forgetPasswordCodeValidation +forgetPasswordCode"
-      );
-      if (!existUser) {
-        return {
-          status: "fail",
-          message: "user does not exist!",
-        };
+        return { status: "fail", message: error.details[0].message };
       }
 
-      if (
-        !existUser.forgetPasswordCode ||
-        !existUser.forgetPasswordCodeValidation
-      ) {
-        return {
-          status: "fail",
-          message: "something is wrong with code!",
-        };
-      }
-      if (Date.now() - existUser.forgetPasswordCodeValidation > 5 * 60 * 1000) {
-        return {
-          status: "fail",
-          message: "Code has expired!",
-        };
-      }
+      // Hash the provided code
+      const codeValue = providedCode.toString();
       const hashedCodevalue = await myHash.hmacProcess(
         codeValue,
         process.env.VERIFICATION_CODE_SECRET as string
       );
-      if (hashedCodevalue !== existUser.forgetPasswordCode) {
-        return {
-          status: "fail",
-          message: "Invalid verification code",
-        };
+
+      // Find the user by the hashed code
+      const existUser = await User.findOne({
+        forgetPasswordCode: hashedCodevalue,
+      }).select("+forgetPasswordCodeValidation +forgetPasswordCode");
+
+      // Validate user and code existence
+      if (!existUser) {
+        return { status: "fail", message: "user does not exist!" };
       }
-      if (hashedCodevalue === existUser.forgetPasswordCode) {
-        existUser.verified = true;
-        existUser.forgetPasswordCode = undefined;
-        existUser.forgetPasswordCodeValidation = undefined;
-        await existUser.save();
-        return {
-          status: "success",
-          message: "Verification successful",
-        };
+
+      if (!existUser.forgetPasswordCodeValidation) {
+        return { status: "fail", message: "something is wrong with code!" };
       }
-      return {
-        status: "fail",
-        message: "Invalid verification code",
-      };
+
+      // Check code expiration (5 minutes)
+      if (Date.now() - existUser.forgetPasswordCodeValidation > 5 * 60 * 1000) {
+        return { status: "fail", message: "Code has expired!" };
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      // Update user fields
+      existUser.password = hashedPassword;
+      existUser.verified = true;
+      existUser.forgetPasswordCode = undefined;
+      existUser.forgetPasswordCodeValidation = undefined;
+
+      await existUser.save();
+
+      return { status: "success", message: "Verification successful" };
     } catch (error) {
       console.log("verification error: ", error);
+      return { status: "error", message: "Internal error during verification" };
     }
   }
 }
