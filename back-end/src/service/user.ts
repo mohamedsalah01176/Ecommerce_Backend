@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import myHash from "../utils/hash";
 import hashpass from "../utils/hash";
 import transport from "../middleware/sendemail";
+import bcrypt from "bcrypt";
 
 export default class UserService {
   constructor() {}
