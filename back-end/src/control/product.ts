@@ -174,7 +174,7 @@ export default class ProductControl {
     const Comment: Comment = {
       userId: req.user.userID,
       comment: req.body.comment,
-      userName: req.user.userName,
+      // userName: req.user.userName,
       createdAt: new Date(),
     };
 
