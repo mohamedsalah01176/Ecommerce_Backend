@@ -55,8 +55,6 @@ export default class ProductService {
         };
       }
 
-      console.log("body", body);
-      console.log(filenames);
       body.images = [...filenames];
 
       let newProduct = new ProductModel({
@@ -155,10 +153,10 @@ export default class ProductService {
           message: "Product Not Found",
         };
       }
-    } catch (errors) {
+    } catch (err) {
       return {
         status: "error",
-        errors,
+        message: err,
       };
     }
   }

@@ -159,6 +159,8 @@ export default class ProductControl {
       filenames
     );
 
+    
+
     if (updateRes.status == "error") {
       res.status(500).send(updateRes);
     } else if (updateRes.status == "fail") {

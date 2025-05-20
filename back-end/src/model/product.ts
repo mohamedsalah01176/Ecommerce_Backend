@@ -6,7 +6,7 @@ let schema = new mongoose.Schema({
   title: {
     type: String,
     minlength: [2, "Title must be at least 2 characters."],
-    required: true,
+    required: [true, "Title must be at least 2 characters."],
   },
   sold: {
     type: Number,
@@ -17,26 +17,52 @@ let schema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
+    required: [true, "Description is required and cannot be empty"],
   },
   quantity: {
     type: Number,
     min: [0, "Quantity cannot be negative."],
-    required: true,
+    required: [true, "Quantity cannot be negative."],
   },
   price: {
     type: Number,
     min: [0, "Price must be a positive number."],
-    required: true,
+    required: [true, "Price must be a positive number."],
   },
   imageCover: {
     type: String,
   },
+
   images: {
     type: [String],
+    required: [true, "You must upload at least one image"],
+    validate: {
+      validator: function (val: any) {
+        return Array.isArray(val) && val.length > 0;
+      },
+      message: "Images array must contain at least one image",
+    },
   },
+  // category: {
+  //   type: Object,
+  //   required: [
+  //     function (this: any) {
+  //       return (
+  //         this.category &&
+  //         typeof this.category.name === "string" &&
+  //         this.category.name.trim().length > 0
+  //       );
+  //     },
+  //     "Category is required and cannot be empty",
+  //   ],
+  // },
+  // images: {
+  //   type: [String],
+  //   required: [true, "must upload one image at least"],
+  // },
   category: {
     type: Object,
+    required: [true, "Category is required"],
   },
   brand: {
     type: Object,
@@ -95,6 +121,17 @@ let schema = new mongoose.Schema({
       },
     },
   ],
+});
+
+schema.pre("validate", function (next) {
+  if (
+    !this.category ||
+    typeof this.category.name !== "string" ||
+    this.category.name.trim().length === 0
+  ) {
+    this.invalidate("category", "Category is required and cannot be empty");
+  }
+  next();
 });
 
 let ProductModel = mongoose.model<IProduct>("product", schema);
