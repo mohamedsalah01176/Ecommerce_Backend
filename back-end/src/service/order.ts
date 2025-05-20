@@ -156,12 +156,13 @@ export default class OrderService{
         let decodedToken = jwt.verify(token,process.env.TOKEN_SECRET as string) as { role: string; userID: string }
         if(decodedToken.role =="admin"){
             try{
-                const order=await OrderModel.findOneAndDelete({_id:orderId})
+                const order=await OrderModel.findOneAndDelete({_id:orderId});
+                const allOrder=await OrderModel.find({});
+                console.log(order)
+                console.log("sssssssssssssssss",allOrder)
                 if(order?.id){
                     const custometFound=await CustomerModel.findOne({userId:order.userId})
                     const userDetails=await UserModel.findOne({_id:order.userId})
-                    console.log(userDetails,"llllll") 
-                    console.log(order.adminsId,"bbbb") 
                     if(custometFound?._id){
                         await CustomerModel.updateOne({userId:order.userId},{$push:{orders:order}})
                     }else{
@@ -170,7 +171,7 @@ export default class OrderService{
                     }
                     return{
                         status:"success",
-                        message:"order Complated",
+                        orders:allOrder,
                     }
                 }else{
                     return{
