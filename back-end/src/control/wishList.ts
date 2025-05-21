@@ -1,5 +1,5 @@
-import WishListService from "../service/wishList";
+// import WishListService from "../service/wishList";
 
-export default class WishListControl{
-    constructor(private wishListService:WishListService){}
-}
+// export default class WishListControl{
+//     constructor(private wishListService:WishListService){}
+// }
