@@ -1,9 +1,10 @@
 {
   "name": "back-end",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "back-end/dist/main.js",
   "scripts": {
-    "start": "nodemon ./src/main.ts"
+    "start": "node back-end/dist/main.js",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
