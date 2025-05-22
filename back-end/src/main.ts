@@ -1,9 +1,9 @@
+require("dotenv").config({ debug: true });
+
 const path = require("path");
 import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
-// import userRouter from "./routes/user";
 import helmet from "helmet";
 import cors from "cors";
 import authUser from "./routes/user";
@@ -17,7 +17,6 @@ import CustomerRouter from "./routes/customer";
 import wishlistRouter from "./routes/wishList";
 const app = express();
 
-dotenv.config();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
@@ -25,6 +24,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+const PORT = process.env.PORT;
+const MONGOURL = process.env.MONGOURL;
+
+mongoose
+  .connect(MONGOURL as string)
+  .then(() => {
+    console.log("mongodb Connected");
+  })
+  .catch(() => console.log("failed", process.env.MONGOURL));
 
 // Meddileware
 
@@ -38,13 +47,6 @@ app.use("/api", cartRouter);
 app.use("/api", CustomerRouter);
 app.use("/api", wishlistRouter);
 
-
-const PORT = process.env.PORT;
-const MONGOURL = process.env.MONGOURL;
-
-mongoose.connect(MONGOURL as string).then(() => {
-  console.log("mongodb Connected");
-});
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
 });
