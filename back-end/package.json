@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node back-end/dist/main.js",
     "build": "tsc && npm run copy-uploads",
-    "copy-uploads": "cp -r back-end/src/uploads back-end/dist/uploads"
+    "copy-uploads": "mkdir -p back-end/dist/uploads && cp -r back-end/src/uploads/* back-end/dist/uploads/ || true"
   },
   "author": "",
   "license": "ISC",
