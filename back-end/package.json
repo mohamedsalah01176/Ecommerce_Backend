@@ -1,10 +1,19 @@
 {
   "name": "back-end",
   "version": "1.0.0",
+<<<<<<< HEAD
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/main.ts"
   },
+=======
+  "main": "back-end/dist/main.js",
+"scripts": {
+  "build": "tsc && npm run copy-uploads",
+  "copy-uploads": "mkdir -p back-end/dist/uploads && cp -r back-end/src/uploads/* back-end/dist/uploads/ || true",
+  "start": "node back-end/dist/main.js"
+},
+>>>>>>> 10442d880cefbc8af6ffd3d5a7cd3097e6380c32
   "author": "",
   "license": "ISC",
   "description": "",
