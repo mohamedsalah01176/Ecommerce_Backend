@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "back-end/dist/main.js",
   "scripts": {
-    "build": "tsc ./src",
+    "build": "tsc",
     "start": "node back-end/dist/main.js"
   },
   "author": "",
