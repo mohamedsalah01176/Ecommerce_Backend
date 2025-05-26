@@ -4,9 +4,8 @@
   "main": "back-end/dist/main.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/main.js"
+    "start": "node back-end/dist/main.js"
   },
-  "type": "module",
   "author": "",
   "license": "ISC",
   "description": "",
