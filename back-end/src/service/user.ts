@@ -6,60 +6,151 @@ import myHash from "../utils/hash";
 import hashpass from "../utils/hash";
 import transport from "../middleware/sendemail";
 import bcrypt from "bcrypt";
+import cloudinary from "./cloudinary";
 
 export default class UserService {
   constructor() {}
 
-  async signUp(user: IUser) {
-    const { username, email, password, phone, role } = user;
 
-    try {
-      const { error, value } = schemas.signUpSchema.validate({
-        username,
-        email,
-        password,
-        phone,
-        role,
+async signUp(user: IUser , file:any) {
+  const { username, email, password, phone, role, avatar } = user;
+    console.log("user"  , user);
+
+  try {
+    let avatarUrl: string | null = null;
+
+    if (file) {
+      avatarUrl = await new Promise<string>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: "avatars" },
+          (error, result) => {
+            if (error) return reject(error);
+            if (result?.secure_url) resolve(result.secure_url);
+            else reject("No URL returned from Cloudinary");
+          }
+        ).end(file?.buffer);
       });
+    } else if (avatar) {
+      avatarUrl = avatar;
+    }
 
-      if (error) {
-        return {
-          status: "fail",
-          message: error.details[0].message,
-        };
-      }
-      const existUser = await User.findOne({ email });
+    console.log("avatarUrl"  , avatarUrl);
+    
 
-      if (existUser) {
-        return {
-          status: "fail",
-          message: "user is already exist",
-        };
-      }
+    const { error } = schemas.signUpSchema.validate({
+      username,
+      email,
+      password,
+      phone,
+      role,
+      avatar: avatarUrl,
+    });
 
-      const hashedPAssword = await hashpass.hashPassword(password, 10);
-
-      const newUser = new User({
-        username,
-        email,
-        password: hashedPAssword,
-        phone,
-        role,
-      });
-      const result = await newUser.save();
-      const { password: _, ...userWithoutPassword } = result.toObject();
-
+    if (error) {
       return {
-        status: "your account has been created",
-        data: userWithoutPassword,
+        status: "fail",
+        message: error.details[0].message,
       };
-    } catch (err) {}
+    }
+
+    const existUser = await User.findOne({ email });
+
+    if (existUser) {
+      return {
+        status: "fail",
+        message: "User already exists",
+      };
+    }
+
+    const hashedPassword = await hashpass.hashPassword(password, 10);
+
+    // بيانات المستخدم الجديدة بدون Avatar افتراضي
+    const newUserData: any = {
+      username,
+      email,
+      password: hashedPassword,
+      phone,
+      role,
+    };
+
+    // لو فعلاً في رابط صورة (مرفوعة أو مرسلة) ضيفها للبيانات
+    if (avatarUrl && avatarUrl.trim() !== "") {
+      newUserData.avatar = avatarUrl;
+    }
+    // لو مفيش صورة هياخد القيمة الافتراضية من موديل mongoose
+
+    const newUser = new User(newUserData);
+    const result = await newUser.save();
+
+    const { password: _, ...userWithoutPassword } = result.toObject();
 
     return {
-      status: "success",
-      message: "User data received",
+      status: "your account has been created",
+      data: userWithoutPassword,
+    };
+  } catch (err) {
+    console.error("Signup error:", err);
+
+    return {
+      status: "error",
+      message: "Internal server error",
     };
   }
+}
+
+
+
+
+  // async signUp(user: IUser) {
+  //   const { username, email, password, phone, role } = user;
+
+  //   try {
+  //     const { error, value } = schemas.signUpSchema.validate({
+  //       username,
+  //       email,
+  //       password,
+  //       phone,
+  //       role,
+  //     });
+
+  //     if (error) {
+  //       return {
+  //         status: "fail",
+  //         message: error.details[0].message,
+  //       };
+  //     }
+  //     const existUser = await User.findOne({ email });
+
+  //     if (existUser) {
+  //       return {
+  //         status: "fail",
+  //         message: "user is already exist",
+  //       };
+  //     }
+
+  //     const hashedPAssword = await hashpass.hashPassword(password, 10);
+
+  //     const newUser = new User({
+  //       username,
+  //       email,
+  //       password: hashedPAssword,
+  //       phone,
+  //       role,
+  //     });
+  //     const result = await newUser.save();
+  //     const { password: _, ...userWithoutPassword } = result.toObject();
+
+  //     return {
+  //       status: "your account has been created",
+  //       data: userWithoutPassword,
+  //     };
+  //   } catch (err) {}
+
+  //   return {
+  //     status: "success",
+  //     message: "User data received",
+  //   };
+  // }
   async signIn(user: IUser) {
     const { email, password } = user;
     try {

@@ -13,7 +13,11 @@ const UserSchema = new Schema(
     verificationCodeValidation: { type: Number, default: false },
     forgetPasswordCode: { type: String, default: false },
     forgetPasswordCodeValidation: { type: Number, default: false },
-    avatar: { type: String, default: "profile.png" },
+    avatar: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/projects-iti/image/upload/v1748224564/avatars/vrj7odkfmzy64wmceurs.png",
+    },
     wishlist: [
       {
         type: Types.ObjectId,

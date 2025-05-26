@@ -4,6 +4,8 @@ import ProductService from "../service/product";
 import { IProduct } from "../interface/product";
 import ProductModel from "../model/product";
 import UserModel from "../model/user";
+import cloudinary from "../service/cloudinary";
+// import cloudinary from "../config/cloudinary";
 
 export default class ProductControl {
   constructor(private productService: ProductService) {}
@@ -27,33 +29,80 @@ export default class ProductControl {
       res.status(200).json(resSer);
     }
   }
+
   async addProduct(req: Request, res: Response) {
     let body = req.body;
     let token = req.headers["authorization"] as string;
-    console.log(req.files);
-
-    // Extract filenames from req.files
     let filenames: string[] = [];
-    if (Array.isArray(req.files)) {
-      filenames = req.files.map((file: any) => file.filename);
-    } else if (req.files && typeof req.files === "object") {
-      filenames = Object.values(req.files)
-        .flat()
-        .map((file: any) => file.filename);
-    }
 
-    let resSer = await this.productService.handleAddProduct(
-      body,
-      token,
-      filenames
-    );
+    try {
+      if (Array.isArray(req.files)) {
+        const uploadPromises = (req.files as Express.Multer.File[]).map(
+          (file) => {
+            return new Promise<string>((resolve, reject) => {
+              cloudinary.uploader
+                .upload_stream(
+                  {
+                    folder: "products",
+                  },
+                  (error, result) => {
+                    if (error) return reject(error);
+                    if (result?.secure_url) resolve(result.secure_url);
+                    else reject("No URL returned from Cloudinary");
+                  }
+                )
+                .end(file.buffer);
+            });
+          }
+        );
 
-    if (resSer.status == "error") {
-      res.status(500).send(resSer);
-    } else {
+        filenames = await Promise.all(uploadPromises);
+      }
+
+      let resSer = await this.productService.handleAddProduct(
+        body,
+        token,
+        filenames
+      );
+
+      if (resSer.status === "error") {
+        return res.status(500).send(resSer);
+      }
+
       res.status(200).send(resSer);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ status: "error", message: "Image upload failed" });
     }
   }
+
+  // async addProduct(req: Request, res: Response) {
+  //   let body = req.body;
+  //   let token = req.headers["authorization"] as string;
+  //   console.log(req.files);
+
+  //   // Extract filenames from req.files
+  //   let filenames: string[] = [];
+  //   if (Array.isArray(req.files)) {
+  //     filenames = req.files.map((file: any) => file.filename);
+  //   } else if (req.files && typeof req.files === "object") {
+  //     filenames = Object.values(req.files)
+  //       .flat()
+  //       .map((file: any) => file.filename);
+  //   }
+
+  //   let resSer = await this.productService.handleAddProduct(
+  //     body,
+  //     token,
+  //     filenames
+  //   );
+
+  //   if (resSer.status == "error") {
+  //     res.status(500).send(resSer);
+  //   } else {
+  //     res.status(200).send(resSer);
+  //   }
+  // }
 
   async deleteProduct(req: Request, res: Response): Promise<void> {
     let id = req.params.id;
@@ -94,61 +143,135 @@ export default class ProductControl {
     }
   }
 
+  // async updateProduct(req: Request, res: Response) {
+  //   let id = req.params.id;
+
+  //   let filenames: string[] = [];
+
+  //   if (Array.isArray(req.files) && req.files.length > 0) {
+  //     filenames = req.files.map((file: any) => file.filename);
+  //   } else if (
+  //     req.files &&
+  //     typeof req.files === "object" &&
+  //     Object.keys(req.files).length > 0
+  //   ) {
+  //     filenames = Object.values(req.files)
+  //       .flat()
+  //       .map((file: any) => file.filename);
+  //   } else {
+  //     const product = await this.productService.handleGetSpecificProduct(id);
+  //     const productList = product.product as IProduct[];
+
+  //     if (!productList || productList.length === 0) {
+  //       res.status(404).send({
+  //         status: "Error",
+  //         message: "Product not found",
+  //       });
+  //       return;
+  //     }
+
+  //     filenames = productList[0].images || [];
+  //   }
+
+  //   if (req.user.role !== "admin") {
+  //     res.status(403).send({
+  //       status: "Error",
+  //       message: "You are not authorized to access this resource!",
+  //     });
+  //     return;
+  //   }
+
+  //   const product = await this.productService.handleGetSpecificProduct(id);
+  //   const productList = product.product as IProduct[];
+
+  //   if (!productList || productList.length === 0) {
+  //     res.status(404).send({
+  //       status: "Error",
+  //       message: "Product not found",
+  //     });
+  //     return;
+  //   }
+
+  //   if (productList[0]?.adminId?.toString() !== req.user.userID) {
+  //     res.status(401).send({
+  //       status: "Error",
+  //       message: "You are not authorized to delete this product",
+  //     });
+  //     return;
+  //   }
+
+  //   const body = req.body;
+
+  //   const updateRes = await this.productService.handleUpdateProduct(
+  //     body,
+  //     id,
+  //     filenames
+  //   );
+
+  //   if (updateRes.status == "error") {
+  //     res.status(500).send(updateRes);
+  //   } else if (updateRes.status == "fail") {
+  //     res.status(404).send(updateRes);
+  //   } else {
+  //     res.status(200).send(updateRes);
+  //   }
+  // }
+
   async updateProduct(req: Request, res: Response) {
-    let id = req.params.id;
-
-    let filenames: string[] = [];
-
-    if (Array.isArray(req.files) && req.files.length > 0) {
-      filenames = req.files.map((file: any) => file.filename);
-    } else if (
-      req.files &&
-      typeof req.files === "object" &&
-      Object.keys(req.files).length > 0
-    ) {
-      filenames = Object.values(req.files)
-        .flat()
-        .map((file: any) => file.filename);
-    } else {
-      const product = await this.productService.handleGetSpecificProduct(id);
-      const productList = product.product as IProduct[];
-
-      if (!productList || productList.length === 0) {
-        res.status(404).send({
-          status: "Error",
-          message: "Product not found",
-        });
-        return;
-      }
-
-      filenames = productList[0].images || [];
-    }
+    const id = req.params.id;
 
     if (req.user.role !== "admin") {
-      res.status(403).send({
+      return res.status(403).send({
         status: "Error",
         message: "You are not authorized to access this resource!",
       });
-      return;
     }
 
     const product = await this.productService.handleGetSpecificProduct(id);
     const productList = product.product as IProduct[];
 
     if (!productList || productList.length === 0) {
-      res.status(404).send({
+      return res.status(404).send({
         status: "Error",
         message: "Product not found",
       });
-      return;
     }
 
     if (productList[0]?.adminId?.toString() !== req.user.userID) {
-      res.status(401).send({
+      return res.status(401).send({
         status: "Error",
-        message: "You are not authorized to delete this product",
+        message: "You are not authorized to update this product",
       });
-      return;
+    }
+
+    let filenames: string[] = [];
+
+    if (Array.isArray(req.files) && req.files.length > 0) {
+      const uploadPromises = (req.files as Express.Multer.File[]).map(
+        (file) => {
+          return new Promise<string>((resolve, reject) => {
+            cloudinary.uploader
+              .upload_stream({ folder: "products" }, (error, result) => {
+                if (error) return reject(error);
+                if (result?.secure_url) resolve(result.secure_url);
+                else reject("No URL returned from Cloudinary");
+              })
+              .end(file.buffer);
+          });
+        }
+      );
+
+      try {
+        filenames = await Promise.all(uploadPromises);
+      } catch (err) {
+        return res.status(500).send({
+          status: "Error",
+          message: "Image upload failed",
+          error: err,
+        });
+      }
+    } else {
+      filenames = productList[0].images || [];
     }
 
     const body = req.body;
@@ -159,14 +282,12 @@ export default class ProductControl {
       filenames
     );
 
-    
-
-    if (updateRes.status == "error") {
-      res.status(500).send(updateRes);
-    } else if (updateRes.status == "fail") {
-      res.status(404).send(updateRes);
+    if (updateRes.status === "error") {
+      return res.status(500).send(updateRes);
+    } else if (updateRes.status === "fail") {
+      return res.status(404).send(updateRes);
     } else {
-      res.status(200).send(updateRes);
+      return res.status(200).send(updateRes);
     }
   }
 

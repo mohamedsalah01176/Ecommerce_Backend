@@ -1,7 +1,9 @@
 import Joi from "joi";
 
 const signUpSchema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(30).required(),
+  username: Joi.string()
+    .pattern(/^[a-zA-Z0-9_.\-\s]{3,30}$/)
+    .required(),
   email: Joi.string()
     .required()
     .min(6)
@@ -27,6 +29,7 @@ const signUpSchema = Joi.object({
   role: Joi.string().valid("user", "admin").required().messages({
     "any.only": "Role must be either 'user' or 'admin'",
   }),
+  avatar: Joi.string().uri().allow(null, "").optional(), // ممكن تكون فارغة أو null
 });
 
 const signInSchema = Joi.object({

@@ -13,27 +13,27 @@ const router = Router();
 const userService = new UserService();
 const userControl = new UserControl(userService);
 
-const diskStorage = multer.diskStorage({
-  destination: function (
-    req: Request,
-    file: Express.Multer.File,
-    cb: (error: Error | null, destination: string) => void
-  ) {
-    const dest = path.join(__dirname, "../uploads");
-    console.log(dest);
+// const diskStorage = multer.diskStorage({
+//   destination: function (
+//     req: Request,
+//     file: Express.Multer.File,
+//     cb: (error: Error | null, destination: string) => void
+//   ) {
+//     const dest = path.join(__dirname, "../uploads");
+//     console.log(dest);
 
-    cb(null, dest);
-  },
-  filename: function (
-    req: Request,
-    file: Express.Multer.File,
-    cb: (error: Error | null, destination: string) => void
-  ) {
-    const ext = file.mimetype.split("/")[1];
-    const fileName = `user-${Date.now()}${Math.random() * 1000}.${ext}`;
-    cb(null, fileName);
-  },
-});
+//     cb(null, dest);
+//   },
+//   filename: function (
+//     req: Request,
+//     file: Express.Multer.File,
+//     cb: (error: Error | null, destination: string) => void
+//   ) {
+//     const ext = file.mimetype.split("/")[1];
+//     const fileName = `user-${Date.now()}${Math.random() * 1000}.${ext}`;
+//     cb(null, fileName);
+//   },
+// });
 
 const fileFilter = (
   req: Request,
@@ -50,11 +50,12 @@ const fileFilter = (
 };
 
 const upload = multer({
-  storage: diskStorage,
+  // storage: diskStorage,
+  storage: multer.memoryStorage(),
   fileFilter,
 });
 
-router.post("/signup", (req, res) => userControl.signUpController(req, res));
+router.post("/signup",upload.single("avatar"), (req, res) => userControl.signUpController(req, res));
 router.post("/signin", userControl.loginController.bind(userControl));
 router.post("/signout", userControl.logOutController.bind(userControl));
 router.patch(
@@ -98,7 +99,9 @@ router.patch(
   "/changeUserInfo",
   upload.single("avatar"),
   verifyToken,
-  userControl.changeUserInfo.bind(userControl)
+  (req, res, next) => {
+    Promise.resolve(userControl.changeUserInfo(req, res)).catch(next);
+  }
 );
 
 export default router;
