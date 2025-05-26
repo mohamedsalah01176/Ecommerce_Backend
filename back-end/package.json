@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "back-end/dist/main.js",
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc && npm run copy-uploads",
+    "copy-uploads": "mkdir -p back-end/dist/uploads && cp -r back-end/src/uploads/* back-end/dist/uploads/ || true",
     "start": "node back-end/dist/main.js"
   },
   "author": "",
