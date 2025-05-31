@@ -16,17 +16,22 @@ This is the **backend API** for an electronic e-commerce platform built with **N
 - **Cloudinary** (optional for image hosting)
 - **CORS**, **dotenv**, **Helmet** for security and configuration
 
-- ## 📁 Folder Structure
-- 
-/FurniHome-Backend
-├── controllers/      # Route handlers (handle HTTP requests/responses)
-├── middleware/       # Auth, error handling, validators
-├── models/           # Mongoose schemas (MongoDB data structure)
-├── routes/           # Express route definitions, grouped by module
-├── services/         # Business logic and data processing
-├── utils/            # Utility functions (e.g. file uploads, helpers)
-├── .env              # Environment variables
-├── main.js 
+
+🧱 Pattern Explanation
+This project follows the MVCS (Model-View-Controller-Service) pattern:
+
+Model – Defines data structure using Mongoose.
+
+View – Not present here (handled on the frontend using Angular).
+
+Controller – Manages request and response objects.
+
+Service – Contains business logic, separating it from controllers.
+
+Routes – Map endpoints to controllers.
+
+Utils & Middleware – Reusable logic and request preprocessing.
+
 
 ## 📦 Features
 
